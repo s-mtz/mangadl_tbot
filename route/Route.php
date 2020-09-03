@@ -1,0 +1,68 @@
+<?php
+
+namespace Route;
+
+use App\Controller\Bot as ControllerBot;
+use App\Controller\Controller as ControllerController;
+
+use FastRoute;
+
+class Route
+{
+    private $dispatcher;
+    private $controller;
+    private $bot;
+
+    public function __construct()
+    {
+        $this->controller = new ControllerController();
+        $this->bot = new ControllerBot();
+    }
+
+    public function start()
+    {
+        $this->dispatcher = FastRoute\simpleDispatcher([&$this, 'init']);
+        $route_info = $this->dispatch();
+        return $this->handle($route_info);
+    }
+
+    public function init(FastRoute\RouteCollector $r)
+    {
+        $r->addRoute('GET', '/', [&$this->controller, 'home']);
+        $r->addRoute('POST', '/bot', [&$this->bot, 'start']);
+    }
+
+    public function dispatch()
+    {
+        $httpMethod = $_SERVER['REQUEST_METHOD'];
+        $uri = $_SERVER['REQUEST_URI'];
+
+        // Strip query string (?foo=bar) and decode URI
+        if (false !== ($pos = strpos($uri, '?'))) {
+            $uri = substr($uri, 0, $pos);
+        }
+        $uri = rawurldecode($uri);
+
+        $route_info = $this->dispatcher->dispatch($httpMethod, $uri);
+        return $route_info;
+    }
+
+    public function handle($route_info)
+    {
+        switch ($route_info[0]) {
+            case FastRoute\Dispatcher::NOT_FOUND:
+                return null;
+                break;
+            case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                // $allowedMethods = $route_info[1];
+                return null;
+                break;
+            case FastRoute\Dispatcher::FOUND:
+                $handler = $route_info[1];
+                $vars = $route_info[2];
+                $parameter = isset($vars[key($vars)]) ? $vars[key($vars)] : null;
+                return $handler($parameter);
+                break;
+        }
+    }
+}
