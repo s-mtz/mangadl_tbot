@@ -1,0 +1,7 @@
+{
+    "name": "s-mtz/mangadl_tbot",
+    "description": "telegram mangadl bot",
+    "type": "project",
+    "license": "GPL3",
+    "require": {}
+}
