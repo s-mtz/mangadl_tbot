@@ -1,2 +1,4 @@
 files/
 test*
+/vendor/
+.env
