@@ -3,3 +3,4 @@ test*
 /vendor/
 .env
 bleach 2.pdf
+*.log

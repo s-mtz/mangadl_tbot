@@ -1,16 +1,16 @@
 <?php
 
-class Manga
+class UserMeta
 {
     public function __construct()
     {
     }
 
-    public function get_manga()
+    public function add_meta()
     {
     }
 
-    public function set_manga()
+    public function get_value()
     {
     }
 }

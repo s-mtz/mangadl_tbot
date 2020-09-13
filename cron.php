@@ -1,9 +1,20 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
+include __DIR__ . '/bootstrap/env.php';
+use Lib\Telegram;
+use GuzzleHttp\Client;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-$dotenv->required(["BOT_TOKEN"]);
+$tg = new Telegram();
+$respon = $tg->proccess_request();
 
-$bot_api_key = $_ENV["bot_token"];
-$bot_username = $_ENV["bot_username"];
+$client = new Client(['base_uri' => "http://manga.test/"]);
+
+$update_id;
+
+foreach ($respon["result"] as $element) {
+    $client->post('bot', ['body' => json_encode($element)]);
+
+    $update_id = $element['update_id'];
+}
+
+$tg->proccess_request($update_id + 1);
