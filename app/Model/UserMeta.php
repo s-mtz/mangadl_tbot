@@ -28,11 +28,11 @@ class UserMeta
      *
      * @param   string  $_chat_id  [$_chat_id description]
      * @param   string  $_key      [$_key description]
-     * @param   [type]  $_value    [$_value description]
+     * @param   string  $_value    [$_value description]
      *
      * @return  [type]             [return description]
      */
-    public function add_meta(string $_chat_id, string $_key, $_value)
+    public function add_meta(string $_chat_id, string $_key, string $_value)
     {
         $sql = "INSERT INTO user_meta (chat_id, key, value) 
         VALUES ($_chat_id, $_key, $_value)";
