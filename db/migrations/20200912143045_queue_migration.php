@@ -27,7 +27,7 @@ final class QueueMigration extends AbstractMigration
             ->addColumn('crawler', 'text')
             ->addColumn('manga', 'text')
             ->addColumn('chapter', 'integer')
-            ->addColumn('type', 'integer')
+            ->addColumn('type', 'string')
             ->addColumn('time', 'biginteger')
             ->addColumn('status', 'text')
 

@@ -10,7 +10,7 @@ final class MessagesMigration extends AbstractMigration
      *
      * 'chat_id' -> is the user telegram id
      * 'content' -> user message input content
-     * 'type' -> user type as normal or permium (level)
+     * 'type' -> type of message as crawler , manga, pdf-zip , garbage
      * 'time' -> to momment that the message was sent
      *
      * @return  void    [return description]

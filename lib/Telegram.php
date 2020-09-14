@@ -60,4 +60,15 @@ class Telegram
 
         return $response->ok;
     }
+
+    public function get_error()
+    {
+        if (empty($this->error)) {
+            return false;
+        }
+        return $this->error;
+    }
+
+    // $this->error["message"] = "couldnt make chapter path";
+    // return false;
 }
