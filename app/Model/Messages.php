@@ -1,8 +1,13 @@
 <?php
 
+namespace app\Model;
+
+use mysqli;
+
 class Messages
 {
     private $conn;
+    private $error = [];
 
     /**
      * [__construct description]
@@ -18,7 +23,7 @@ class Messages
             $_ENV['MYSQL_DATABASE']
         );
         if ($this->conn->connect_error) {
-            $this->error["message"] = "couldnt send connect to database";
+            $this->error["message"] = "couldnt connect to database";
             return false;
         }
     }
@@ -35,13 +40,16 @@ class Messages
      */
     public function set_messages(string $_chat_id, string $_content, string $_type, int $_time)
     {
+        $_content = filter_var($_content, FILTER_SANITIZE_STRING);
+
         $sql = "INSERT INTO messages (chat_id, content, type, time) 
-        VALUES ($_chat_id, $_content, $_type, $_time)";
+                VALUES ('{$_chat_id}', '{$_content}', '{$_type}', $_time)";
 
         if ($this->conn->query($sql) === false) {
             $this->error["message"] = "couldnt send set_messages query to database";
             return false;
         }
+        return true;
     }
 
     /**
@@ -54,26 +62,38 @@ class Messages
      */
     public function get_last_messages(string $_chat_id, string $_type)
     {
-        $sql = "SELECT chat_id, type FROM messages WHERE chat_id = $_chat_id and type = $_type ORDER BY id DESC LIMIT 1";
-        if ($this->conn->query($sql) === true) {
-            if (empty($this->conn->query($sql)->fetch_all())) {
+        $sql = "SELECT chat_id, type FROM messages 
+        WHERE chat_id = '{$_chat_id}' and type = '{$_type}' 
+        ORDER BY id DESC LIMIT 1";
+
+        if ($this->conn->query($sql)->num_rows > 0) {
+            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+            if (empty($data)) {
                 $this->error["message"] = "couldnt find the request in database";
                 return false;
             }
-            return json_encode($this->conn->query($sql)->fetch_all());
-        } else {
-            $this->error["message"] = "couldnt send get_last_messages query to database";
-            return false;
+            return $data[0];
         }
+        $this->error["message"] = "there is nothing in database";
+        return false;
     }
 
     /**
      * [finish description]
      *
-     * @return  [type]  [return description]
+     * @param   string  $_chat_id  [$_chat_id description]
+     *
+     * @return  [type]             [return description]
      */
-    public function finish()
+    public function finish(string $_chat_id)
     {
+        $sql = "DELETE FROM messages WHERE chat_id = '{$_chat_id}'";
+
+        if ($this->conn->query($sql) === false) {
+            $this->error["message"] = "couldnt send get_last_messages query to database";
+            return false;
+        }
+        return true;
     }
 
     /**

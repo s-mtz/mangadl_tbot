@@ -1,8 +1,13 @@
 <?php
 
+namespace app\Model;
+
+use mysqli;
+
 class UserMeta
 {
     private $conn;
+    private $error = [];
 
     /**
      * [__construct description]
@@ -18,7 +23,7 @@ class UserMeta
             $_ENV['MYSQL_DATABASE']
         );
         if ($this->conn->connect_error) {
-            $this->error["message"] = "couldnt send connect to database";
+            $this->error["message"] = "couldnt connect to database";
             return false;
         }
     }
@@ -34,13 +39,14 @@ class UserMeta
      */
     public function add_meta(string $_chat_id, string $_key, string $_value)
     {
-        $sql = "INSERT INTO user_meta (chat_id, key, value) 
-        VALUES ($_chat_id, $_key, $_value)";
+        $sql = "INSERT INTO user_meta (`chat_id`, `key`, `value`) 
+                VALUES ('{$_chat_id}', '{$_key}', '{$_value}')";
 
         if ($this->conn->query($sql) === false) {
-            $this->error["message"] = "couldnt send new_user query to database";
+            $this->error["message"] = "couldnt send query to database";
             return false;
         }
+        return true;
     }
 
     /**
@@ -53,17 +59,16 @@ class UserMeta
      */
     public function get_value(string $_chat_id, string $_key)
     {
-        $sql = "SELECT chat_id, key FROM user_meta WHERE chat_id = $_chat_id and key = $_key";
-        if ($this->conn->query($sql) === true) {
-            if (empty($this->conn->query($sql)->fetch_all())) {
-                $this->error["message"] = "couldnt find the user in database";
-                return false;
-            }
-            return json_encode($this->conn->query($sql)->fetch_all());
-        } else {
-            $this->error["message"] = "couldnt send get_value query to database";
-            return false;
+        $sql = "SELECT * FROM user_meta 
+                WHERE chat_id = '{$_chat_id}' and `key` = '{$_key}' 
+                ORDER BY id DESC LIMIT 1";
+
+        if ($this->conn->query($sql)->num_rows > 0) {
+            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+            return $data[0];
         }
+        $this->error["message"] = "there is nothing in database";
+        return false;
     }
 
     /**

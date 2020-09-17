@@ -1,8 +1,13 @@
 <?php
 
+namespace app\Model;
+
+use mysqli;
+
 class Manga
 {
     private $conn;
+    private $error = [];
 
     /**
      * [__construct description]
@@ -18,7 +23,7 @@ class Manga
             $_ENV['MYSQL_DATABASE']
         );
         if ($this->conn->connect_error) {
-            $this->error["message"] = "couldnt send connect to database";
+            $this->error["message"] = "couldnt connect to database";
             return false;
         }
     }
@@ -35,13 +40,14 @@ class Manga
         int $_chapter,
         int $_time
     ) {
-        $sql = "INSERT INTO manga (dir, crawle, manga, chapter, time) 
-        VALUES ($_dir, $_crawler, $_manga, $_chapter, $_time)";
+        $sql = "INSERT INTO manga (dir, crawler, manga, chapter, time) 
+                VALUES ('{$_dir}', '{$_crawler}', '{$_manga}', $_chapter, $_time)";
 
         if ($this->conn->query($sql) === false) {
             $this->error["message"] = "couldnt send set_manga query to database";
             return false;
         }
+        return true;
     }
 
     /**
@@ -55,17 +61,19 @@ class Manga
      */
     public function get_manga(string $_crawler, string $_manga, int $_chapter)
     {
-        $sql = "SELECT crawle, manga, chapter FROM manga WHERE crawle = $_crawler and manga = $_manga and chapter = $_chapter";
-        if ($this->conn->query($sql) === true) {
-            if (empty($this->conn->query($sql)->fetch_all())) {
+        $sql = "SELECT crawler, manga, chapter FROM manga 
+                WHERE crawler = '{$_crawler}' and manga = '{$_manga}' and chapter = $_chapter";
+
+        if ($this->conn->query($sql)->num_rows > 0) {
+            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+            if (empty($data)) {
                 $this->error["message"] = "couldnt find the manga in database";
                 return false;
             }
-            return json_encode($this->conn->query($sql)->fetch_all());
-        } else {
-            $this->error["message"] = "couldnt send get_manga query to database";
-            return false;
+            return $data;
         }
+        $this->error["message"] = "there is nothing in database";
+        return false;
     }
 
     /**

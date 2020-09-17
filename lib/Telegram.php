@@ -3,19 +3,31 @@
 namespace Lib;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
 
 class Telegram
 {
     private $apiURL;
     private $client;
+    private $error = [];
 
+    /**
+     * [__construct description]
+     *
+     * @return  [type]  [return description]
+     */
     public function __construct()
     {
         $this->apiURL = 'https://api.telegram.org/bot' . $_ENV['BOT_TOKEN'] . '/';
         $this->client = new Client(['base_uri' => $this->apiURL]);
     }
 
+    /**
+     * [proccess_request description]
+     *
+     * @param   [type]  $offset  [$offset description]
+     *
+     * @return  [type]           [return description]
+     */
     public function proccess_request($offset = 0)
     {
         $response = $this->client->get('getUpdates', [
@@ -25,6 +37,14 @@ class Telegram
         return $updates;
     }
 
+    /**
+     * [send_message_request description]
+     *
+     * @param   int     $_chat_id  [$_chat_id description]
+     * @param   string  $_message  [$_message description]
+     *
+     * @return  [type]             [return description]
+     */
     public function send_message_request(int $_chat_id, string $_message)
     {
         $res = $this->client->post('sendMessage', [
@@ -34,13 +54,22 @@ class Telegram
             ],
         ]);
         if ($res->getStatusCode() !== 200) {
+            $this->error["message"] = "couldent send_message_request to the api";
             return false;
         }
-        $response = json_decode($res->getBody()->getContents());
 
-        return $response->ok;
+        if (json_decode($res->getBody()->getContents(), true) === true);
+        return true;
     }
 
+    /**
+     * [send_file_request description]
+     *
+     * @param   int     $_chat_id  [$_chat_id description]
+     * @param   string  $_path     [$_path description]
+     *
+     * @return  [type]             [return description]
+     */
     public function send_file_request(int $_chat_id, string $_path)
     {
         $res = $this->client->post('sendDocument', [
@@ -54,13 +83,19 @@ class Telegram
         ]);
 
         if ($res->getStatusCode() !== 200) {
+            $this->error["message"] = "couldent send_file_request to the api";
             return false;
         }
-        $response = json_decode($res->getBody()->getContents());
 
-        return $response->ok;
+        if ($response = json_decode($res->getBody()->getContents(), true) === true);
+        return true;
     }
 
+    /**
+     * [get_error description]
+     *
+     * @return  [type]  [return description]
+     */
     public function get_error()
     {
         if (empty($this->error)) {
@@ -68,7 +103,4 @@ class Telegram
         }
         return $this->error;
     }
-
-    // $this->error["message"] = "couldnt make chapter path";
-    // return false;
 }

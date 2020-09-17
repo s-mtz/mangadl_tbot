@@ -1,8 +1,13 @@
 <?php
 
+namespace app\Model;
+
+use mysqli;
+
 class Queue
 {
     private $conn;
+    private $error = [];
 
     /**
      * [__construct description]
@@ -18,7 +23,7 @@ class Queue
             $_ENV['MYSQL_DATABASE']
         );
         if ($this->conn->connect_error) {
-            $this->error["message"] = "couldnt send connect to database";
+            $this->error["message"] = "couldnt connect to database";
             return false;
         }
     }
@@ -37,13 +42,14 @@ class Queue
         int $_time,
         string $_status
     ) {
-        $sql = "INSERT INTO queue (chat_id, crawle, manga, chapter, type, time, status) 
-        VALUES ($_chat_id, $_crawler, $_manga, $_chapter, $_type, $_time, $_status)";
+        $sql = "INSERT INTO queue (chat_id, crawler, manga, chapter, type, time, status) 
+        VALUES ('{$_chat_id}', '{$_crawler}', '{$_manga}', $_chapter, $_type, $_time, '{$_status}')";
 
         if ($this->conn->query($sql) === false) {
             $this->error["message"] = "couldnt send set_queue query to database";
             return false;
         }
+        return true;
     }
 
     /**
@@ -55,19 +61,19 @@ class Queue
     {
         // need ro be fixed i dont get how to set the get updates its so confusing po
 
-        $sql = "SELECT chat_id, crawle, manga, chapter, type, status  FROM queue 
-            ORDER BY id DESC LIMIT 10";
+        $sql = "SELECT chat_id, crawler, manga, chapter, type, status  FROM queue 
+                ORDER BY type DESC LIMIT 1";
 
-        if ($this->conn->query($sql) === true) {
-            if (empty($this->conn->query($sql)->fetch_all())) {
+        if ($this->conn->query($sql)->num_rows > 0) {
+            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+            if (empty($data)) {
                 $this->error["message"] = "couldnt find the queue in database";
                 return false;
             }
-            return json_encode($this->conn->query($sql)->fetch_all());
-        } else {
-            $this->error["message"] = "couldnt send get_queue query to database";
-            return false;
+            return $data[0];
         }
+        $this->error["message"] = "there is nothing in database";
+        return false;
     }
 
     /**
@@ -81,20 +87,15 @@ class Queue
      */
     public function update_queue(string $_chat_id, string $_old_status, string $_new_status)
     {
-        $sql = "UPDATE queue SET status = $_new_status 
-                WHERE chat_id = $_chat_id and status = $_old_status
+        $sql = "UPDATE queue SET status = '{$_new_status}' 
+                WHERE chat_id = '{$_chat_id}' and status = '{$_old_status}'
                 ORDER BY id DESC LIMIT 1";
 
         if ($this->conn->query($sql) === true) {
-            if (empty($this->conn->query($sql)->fetch_all())) {
-                $this->error["message"] = "couldnt find the queue in database";
-                return false;
-            }
-            return json_encode($this->conn->query($sql)->fetch_all());
-        } else {
-            $this->error["message"] = "couldnt send update_queue query to database";
-            return false;
+            return true;
         }
+        $this->error["message"] = "there is nothing in database";
+        return false;
     }
 
     /**
