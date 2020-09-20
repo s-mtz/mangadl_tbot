@@ -6,8 +6,7 @@ use GuzzleHttp\Client;
 
 $tg = new Telegram();
 $respon = $tg->proccess_request();
-
-$client = new Client(['base_uri' => "http://manga.test/"]);
+$client = new Client(['base_uri' => $_ENV["HOST"]]);
 
 $update_id = 0;
 
