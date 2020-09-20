@@ -6,7 +6,6 @@ use Lib\Core\Model as ModelAbstract;
 
 class Messages extends ModelAbstract
 {
-    private $conn;
     private $error = [];
 
     /**
@@ -52,9 +51,9 @@ class Messages extends ModelAbstract
                     WHERE chat_id = '{$_chat_id}' and type = '{$_type}' 
                     ORDER BY id DESC LIMIT 1";
         }
-
-        if ($this->conn->query($sql)->num_rows > 0) {
-            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+        $query = $this->conn->query($sql);
+        if ($query->num_rows > 0) {
+            $data = $query->fetch_all(MYSQLI_ASSOC);
             if (empty($data)) {
                 $this->error["message"] = "couldnt find the request in database";
                 return false;
@@ -75,10 +74,10 @@ class Messages extends ModelAbstract
     public function get_all_messages(string $_chat_id)
     {
         $sql = "SELECT content FROM messages 
-                WHERE chat_id = '{$_chat_id}'";
-
-        if ($this->conn->query($sql)->num_rows > 0) {
-            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+                WHERE chat_id='{$_chat_id}'";
+        $query = $this->conn->query($sql);
+        if ($query->num_rows > 0) {
+            $data = $query->fetch_all(MYSQLI_ASSOC);
             if (empty($data)) {
                 $this->error["message"] = "couldnt find the request in database";
                 return false;

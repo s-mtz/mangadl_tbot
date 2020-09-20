@@ -8,7 +8,8 @@ class Controller
     {
     }
 
-    public function start()
+    public function home()
     {
+        echo "HELLO";
     }
 }

@@ -9,7 +9,7 @@ class QueueTest extends TestCase
     public function testSetManga()
     {
         $sm = new Queue();
-        $result = $sm->get_mesage_threrade("476080724");
+        $result = $sm->get_mesage_threrade($_ENV["ADMIN_ID"]);
         var_dump($sm->get_error());
         $this->assertTrue($result);
     }

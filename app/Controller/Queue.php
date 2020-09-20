@@ -52,13 +52,13 @@ class Queue
             $manga_q['crawler'],
             $manga_q['manga'],
             $manga_q['chapter'],
-            __DIR__ . "/../upload"
+            ABSPATH . "upload/"
         );
         $Q->update_queue($manga_q['id'], $manga_q['chat_id'], "processing", "finished");
         $tg->send_file_request(
             $manga_q['chat_id'],
-            __DIR__ .
-                "/../upload" .
+            ABSPATH .
+                "upload/" .
                 $manga_q['crawler'] .
                 "/" .
                 $manga_q['manga'] .

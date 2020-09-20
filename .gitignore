@@ -3,3 +3,4 @@ files/
 .env
 bleach 2.pdf
 *.log
+upload/
