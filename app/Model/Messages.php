@@ -70,11 +70,11 @@ class Messages extends ModelAbstract
      *
      * @param   string  $_chat_id  [$_chat_id description]
      *
-     * @return  array   $data      [[0] -> crawler, [1] -> manga, [2] -> chapter_start, [3] -> chapter_finish ]
+     * @return  array   $data      [0] -> crawler, [1] -> manga, [2] -> chapter_start, [3] -> chapter_finish ]
      */
     public function get_all_messages(string $_chat_id)
     {
-        $sql = "SELECT chat_id, type FROM messages 
+        $sql = "SELECT content FROM messages 
                 WHERE chat_id = '{$_chat_id}'";
 
         if ($this->conn->query($sql)->num_rows > 0) {
