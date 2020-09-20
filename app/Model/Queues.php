@@ -4,7 +4,7 @@ namespace app\Model;
 
 use mysqli;
 
-class Queue
+class Queues
 {
     private $conn;
     private $error = [];
