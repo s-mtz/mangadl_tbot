@@ -19,7 +19,7 @@ class MangaTest extends TestCase
     public function testGetManga()
     {
         $sm = new Manga();
-        $result = $sm->get_manga("mangapanda", "bleach", 6);
+        $result = $sm->get_manga("bleach", 6);
         var_dump($sm->get_error());
         assertTrue(is_array($result));
     }

@@ -2,31 +2,11 @@
 
 namespace app\Model;
 
-use mysqli;
+use Lib\Core\Model as ModelAbstract;
 
-class Manga
+class Manga extends ModelAbstract
 {
-    private $conn;
     private $error = [];
-
-    /**
-     * [__construct description]
-     *
-     * @return  [type]  [return description]
-     */
-    public function __construct()
-    {
-        $this->conn = new mysqli(
-            $_ENV['MYSQL_HOST'],
-            $_ENV['MYSQL_USER'],
-            $_ENV['MYSQL_PASSWORD'],
-            $_ENV['MYSQL_DATABASE']
-        );
-        if ($this->conn->connect_error) {
-            $this->error["message"] = "couldnt connect to database";
-            return false;
-        }
-    }
 
     /**
      * [set_manga description]
@@ -53,19 +33,21 @@ class Manga
     /**
      * [get_manga description]
      *
-     * @param   string  $_crawler  [$_crawler description]
      * @param   string  $_manga    [$_manga description]
      * @param   int     $_chapter  [$_chapter description]
+     * @param   string  $_crawler  [$_crawler description]
      *
      * @return  [type]             [return description]
      */
-    public function get_manga(string $_crawler, string $_manga, int $_chapter)
+    public function get_manga(string $_manga, int $_chapter, string $_crawler = '')
     {
+        $where = "";
+        $where .= empty($_crawler) ? "" : "crawler = '{$_crawler}'  and";
         $sql = "SELECT crawler, manga, chapter FROM manga 
-                WHERE crawler = '{$_crawler}' and manga = '{$_manga}' and chapter = $_chapter";
-
-        if ($this->conn->query($sql)->num_rows > 0) {
-            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+                WHERE {$where} manga = '{$_manga}' and chapter = $_chapter";
+        $query = $this->conn->query($sql);
+        if ($query->num_rows > 0) {
+            $data = $query->fetch_all(MYSQLI_ASSOC);
             if (empty($data)) {
                 $this->error["message"] = "couldnt find the manga in database";
                 return false;
@@ -84,7 +66,7 @@ class Manga
     public function get_error()
     {
         if (empty($this->error)) {
-            return false;
+            return null;
         }
         return $this->error;
     }

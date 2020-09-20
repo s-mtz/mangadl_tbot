@@ -2,33 +2,12 @@
 
 namespace app\Model;
 
-use mysqli;
+use Lib\Core\Model as ModelAbstract;
 
-use function PHPUnit\Framework\isNull;
-
-class Messages
+class Messages extends ModelAbstract
 {
     private $conn;
     private $error = [];
-
-    /**
-     * [__construct description]
-     *
-     * @return  [type]  [return description]
-     */
-    public function __construct()
-    {
-        $this->conn = new mysqli(
-            $_ENV['MYSQL_HOST'],
-            $_ENV['MYSQL_USER'],
-            $_ENV['MYSQL_PASSWORD'],
-            $_ENV['MYSQL_DATABASE']
-        );
-        if ($this->conn->connect_error) {
-            $this->error["message"] = "couldnt connect to database";
-            return false;
-        }
-    }
 
     /**
      * [set_messages description]
@@ -64,7 +43,7 @@ class Messages
      */
     public function get_last_messages(string $_chat_id, string $_type = null)
     {
-        if (isNull($_type)) {
+        if ($_type === null) {
             $sql = "SELECT * FROM messages 
                     WHERE chat_id = '{$_chat_id}' 
                     ORDER BY id DESC LIMIT 1";

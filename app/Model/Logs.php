@@ -1,5 +1,6 @@
 <?php
+use Lib\Core\Model as ModelAbstract;
 
-class Logs
+class Logs extends ModelAbstract
 {
 }
