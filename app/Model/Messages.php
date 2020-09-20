@@ -4,6 +4,8 @@ namespace app\Model;
 
 use mysqli;
 
+use function PHPUnit\Framework\isNull;
+
 class Messages
 {
     private $conn;
@@ -60,11 +62,17 @@ class Messages
      *
      * @return  [type]             [return description]
      */
-    public function get_last_messages(string $_chat_id, string $_type)
+    public function get_last_messages(string $_chat_id, string $_type = null)
     {
-        $sql = "SELECT chat_id, type FROM messages 
-        WHERE chat_id = '{$_chat_id}' and type = '{$_type}' 
-        ORDER BY id DESC LIMIT 1";
+        if (isNull($_type)) {
+            $sql = "SELECT * FROM messages 
+                    WHERE chat_id = '{$_chat_id}' 
+                    ORDER BY id DESC LIMIT 1";
+        } else {
+            $sql = "SELECT * FROM messages 
+                    WHERE chat_id = '{$_chat_id}' and type = '{$_type}' 
+                    ORDER BY id DESC LIMIT 1";
+        }
 
         if ($this->conn->query($sql)->num_rows > 0) {
             $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
@@ -73,6 +81,30 @@ class Messages
                 return false;
             }
             return $data[0];
+        }
+        $this->error["message"] = "there is nothing in database";
+        return false;
+    }
+
+    /**
+     * [get_all_messages description]
+     *
+     * @param   string  $_chat_id  [$_chat_id description]
+     *
+     * @return  array   $data      [[0] -> crawler, [1] -> manga, [2] -> chapter_start, [3] -> chapter_finish ]
+     */
+    public function get_all_messages(string $_chat_id)
+    {
+        $sql = "SELECT chat_id, type FROM messages 
+                WHERE chat_id = '{$_chat_id}'";
+
+        if ($this->conn->query($sql)->num_rows > 0) {
+            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+            if (empty($data)) {
+                $this->error["message"] = "couldnt find the request in database";
+                return false;
+            }
+            return $data;
         }
         $this->error["message"] = "there is nothing in database";
         return false;

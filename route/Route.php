@@ -30,6 +30,7 @@ class Route
     {
         $r->addRoute('GET', '/', [&$this->controller, 'home']);
         $r->addRoute('POST', '/bot', [&$this->bot, 'start']);
+        // $r->addRoute('POST', '/queue', [&$this->bot, 'start']);
     }
 
     public function dispatch()

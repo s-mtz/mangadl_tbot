@@ -4,12 +4,7 @@ use App\Model\Messages;
 
 use function PHPUnit\Framework\assertTrue;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-$dotenv->required(["MYSQL_HOST"]);
-$dotenv->required(["MYSQL_USER"]);
-$dotenv->required(["MYSQL_DATABASE"]);
-$dotenv->required(["MYSQL_PASSWORD"]);
+include __DIR__ . "/../../bootstrap/env.php";
 
 class MessagesTest extends TestCase
 {
@@ -25,9 +20,9 @@ class MessagesTest extends TestCase
     public function testGetLastMessages()
     {
         $sm = new Messages();
-        $result = $sm->get_last_messages("4700001", "crawler");
+        $result = $sm->get_last_messages("4700001");
         var_dump($sm->get_error());
-
+        var_dump($result);
         assertTrue(is_array($result));
     }
 

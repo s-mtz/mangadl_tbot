@@ -4,12 +4,7 @@ use App\Model\UserMeta;
 
 use function PHPUnit\Framework\assertTrue;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-$dotenv->required(["MYSQL_HOST"]);
-$dotenv->required(["MYSQL_USER"]);
-$dotenv->required(["MYSQL_DATABASE"]);
-$dotenv->required(["MYSQL_PASSWORD"]);
+include __DIR__ . "/../../bootstrap/env.php";
 
 class UserMetaTest extends TestCase
 {

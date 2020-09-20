@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Lib\Telegram;
+use App\Controller\Message;
 
 class Bot
 {
@@ -16,8 +17,7 @@ class Bot
     {
         $data = file_get_contents('php://input');
         $update = json_decode($data, true);
-        var_dump(
-            $this->tg->send_message_request($update['message']['from']['id'], json_encode($update))
-        );
+        $sm = new Message();
+        $sm->listen($update['message']);
     }
 }

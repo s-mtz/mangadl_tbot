@@ -2,9 +2,7 @@
 use PHPUnit\Framework\TestCase;
 use Lib\Telegram;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-$dotenv->required(["BOT_TOKEN"]);
+include __DIR__ . "/../../bootstrap/env.php";
 
 class TelegramTest extends TestCase
 {

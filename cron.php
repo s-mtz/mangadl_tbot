@@ -9,7 +9,7 @@ $respon = $tg->proccess_request();
 
 $client = new Client(['base_uri' => "http://manga.test/"]);
 
-$update_id;
+$update_id = 0;
 
 foreach ($respon["result"] as $element) {
     $client->post('bot', ['body' => json_encode($element)]);
