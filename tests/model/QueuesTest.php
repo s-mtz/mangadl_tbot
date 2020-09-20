@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use App\Model\Queue;
+use App\Model\Queues;
 
 use function PHPUnit\Framework\assertTrue;
 
@@ -10,7 +10,7 @@ class QueueTest extends TestCase
 {
     public function testSetQueue()
     {
-        $sm = new Queue();
+        $sm = new Queues();
         $result = $sm->set_queue(
             "4700001",
             "mangapanda",
@@ -27,8 +27,9 @@ class QueueTest extends TestCase
 
     public function testGetQueue()
     {
-        $sm = new Queue();
+        $sm = new Queues();
         $result = $sm->get_queue();
+        var_dump($result);
         var_dump($sm->get_error());
 
         assertTrue(is_array($result));
@@ -36,8 +37,8 @@ class QueueTest extends TestCase
 
     public function testUpdateQueue()
     {
-        $sm = new Queue();
-        $result = $sm->update_queue("4700001", "not done yet", "complited");
+        $sm = new Queues();
+        $result = $sm->update_queue(1, "4700001", "not done yet", "complited");
         var_dump($sm->get_error());
 
         assertTrue($result);

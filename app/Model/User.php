@@ -38,7 +38,7 @@ class User extends ModelAbstract
      */
     public function get_user(string $_chat_id)
     {
-        $sql = "SELECT chat_id FROM user 
+        $sql = "SELECT * FROM user 
         WHERE chat_id = '{$_chat_id}'";
 
         if ($this->conn->query($sql)->num_rows > 0) {

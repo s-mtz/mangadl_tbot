@@ -3,8 +3,9 @@
 namespace App\Controller;
 use App\Model\Messages;
 use App\Model\Queues;
+use Lib\Telegram;
 
-use MangaCrawlers\Validator;
+use MangaCrawlers\Manga;
 
 use function PHPSTORM_META\type;
 
@@ -37,6 +38,38 @@ class Queue
             $this->error["message"] = "couldnt erase the message from database";
             return false;
         }
+        return true;
+    }
+
+    public function run_queue(int $count = null)
+    {
+        $Q = new Queues();
+        $download = new Manga();
+        $tg = new Telegram();
+        $manga_q = $Q->get_queue("pendindg");
+        $Q->update_queue($manga_q['id'], $manga_q['chat_id'], "pendindg", "processing");
+        $download->downloader(
+            $manga_q['crawler'],
+            $manga_q['manga'],
+            $manga_q['chapter'],
+            __DIR__ . "/../upload"
+        );
+        $Q->update_queue($manga_q['id'], $manga_q['chat_id'], "processing", "finished");
+        $tg->send_file_request(
+            $manga_q['chat_id'],
+            __DIR__ .
+                "/../upload" .
+                $manga_q['crawler'] .
+                "/" .
+                $manga_q['manga'] .
+                "/" .
+                $manga_q['chapter'] .
+                "/" .
+                $manga_q['manga'] .
+                " " .
+                $manga_q['chapter'] .
+                ".pdf"
+        );
         return true;
     }
 
