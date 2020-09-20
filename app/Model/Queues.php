@@ -4,9 +4,8 @@ namespace app\Model;
 
 use Lib\Core\Model as ModelAbstract;
 
-class Queues
+class Queues extends ModelAbstract
 {
-    private $conn;
     private $error = [];
 
     /**
