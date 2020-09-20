@@ -2,31 +2,12 @@
 
 namespace app\Model;
 
-use mysqli;
+use Lib\Core\Model as ModelAbstract;
 
-class Queue
+class Queue extends ModelAbstract
 {
     private $conn;
     private $error = [];
-
-    /**
-     * [__construct description]
-     *
-     * @return  [type]  [return description]
-     */
-    public function __construct()
-    {
-        $this->conn = new mysqli(
-            $_ENV['MYSQL_HOST'],
-            $_ENV['MYSQL_USER'],
-            $_ENV['MYSQL_PASSWORD'],
-            $_ENV['MYSQL_DATABASE']
-        );
-        if ($this->conn->connect_error) {
-            $this->error["message"] = "couldnt connect to database";
-            return false;
-        }
-    }
 
     /**
      * [set_queue description]
