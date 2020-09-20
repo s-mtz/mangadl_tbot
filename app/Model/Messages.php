@@ -95,7 +95,7 @@ class Messages
      */
     public function get_all_messages(string $_chat_id)
     {
-        $sql = "SELECT * FROM messages 
+        $sql = "SELECT content FROM messages 
                 WHERE chat_id = '{$_chat_id}'";
 
         if ($this->conn->query($sql)->num_rows > 0) {
