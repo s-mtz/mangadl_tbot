@@ -43,9 +43,12 @@ class Manga extends ModelAbstract
     {
         $where = "";
         $where .= empty($_crawler) ? "" : "crawler = '{$_crawler}'  and";
+
         $sql = "SELECT crawler, manga, chapter FROM manga 
                 WHERE {$where} manga = '{$_manga}' and chapter = $_chapter";
+
         $query = $this->conn->query($sql);
+
         if ($query->num_rows > 0) {
             $data = $query->fetch_all(MYSQLI_ASSOC);
             if (empty($data)) {

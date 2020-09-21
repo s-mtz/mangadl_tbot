@@ -17,7 +17,7 @@ class QueueTest extends TestCase
     public function testRunQueue()
     {
         $sm = new Queue();
-        $result = $sm->run_queue();
+        $result = $sm->run();
         var_dump($sm->get_error());
         $this->assertTrue($result);
     }

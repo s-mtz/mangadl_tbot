@@ -4,6 +4,7 @@ namespace Route;
 
 use App\Controller\Bot as ControllerBot;
 use App\Controller\Controller as ControllerController;
+use App\Controller\Queue as ControllerContQueue;
 
 use FastRoute;
 
@@ -12,11 +13,13 @@ class Route
     private $dispatcher;
     private $controller;
     private $bot;
+    private $queue;
 
     public function __construct()
     {
         $this->controller = new ControllerController();
         $this->bot = new ControllerBot();
+        $this->queue = new ControllerContQueue();
     }
 
     public function start()
@@ -30,7 +33,7 @@ class Route
     {
         $r->addRoute('GET', '/', [&$this->controller, 'home']);
         $r->addRoute('POST', '/bot', [&$this->bot, 'start']);
-        // $r->addRoute('POST', '/queue', [&$this->bot, 'start']);
+        $r->addRoute('POST', '/queue/{count:\d+}', [&$this->queue, 'run']);
     }
 
     public function dispatch()

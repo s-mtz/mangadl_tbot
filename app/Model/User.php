@@ -41,8 +41,13 @@ class User extends ModelAbstract
         $sql = "SELECT * FROM user 
         WHERE chat_id = '{$_chat_id}'";
 
-        if ($this->conn->query($sql)->num_rows > 0) {
-            $data = $this->conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+        if (!($query = $this->conn->query($sql))) {
+            $this->error["message"] = "couldnt connect to database";
+            return false;
+        }
+
+        if ($query->num_rows > 0) {
+            $data = $query->fetch_all(MYSQLI_ASSOC);
             if (empty($data)) {
                 $this->error["message"] = "couldnt find the user in database";
                 return false;
