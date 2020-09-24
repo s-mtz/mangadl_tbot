@@ -56,18 +56,24 @@ class Queue
         return false;
     }
 
-    public function run(int $count = null)
+    public function run(int $_count = 1)
     {
         $tg = new Telegram();
-        $tg->send_message_request("476080724", "HO");
         $Q = new Queues();
+        if ($Q->get_processing_count() > $_count) {
+            return null;
+        }
         $download = new Manga();
         $manga_q = $Q->get_queue("pending");
         if (!$manga_q) {
             return false;
         }
         if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "pending", "processing")) {
-            return $this->error_function("Couldn't proccess your job", $manga_q['chat_id']);
+            $this->error_function("Couldn't proccess your job", $manga_q['chat_id']);
+            return $this->error_function(
+                "There is a problem in DB  " . $manga_q['id'] . " ERROR : " . $Q->get_error(),
+                $_ENV["ADMIN_ID"]
+            );
         }
         if (
             !$download->downloader(
@@ -103,14 +109,21 @@ class Queue
                     ".pdf"
             )
         ) {
+            $this->error_function("There is a problem in sending the files", $manga_q['chat_id']);
             return $this->error_function(
-                "There is a problem in sending the files",
-                $manga_q['chat_id']
+                "There is a problem in SendFile  " .
+                    $manga_q['id'] .
+                    " ERROR : " .
+                    $tg->get_error(),
+                $_ENV["ADMIN_ID"]
             );
         }
         if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "processing", "finished")) {
             return $this->error_function(
-                "Problem in complete queue Q id : " . $manga_q['id'],
+                "Problem in complete queue Q id : " .
+                    $manga_q['id'] .
+                    " ERROR : " .
+                    $Q->get_error(),
                 $_ENV["ADMIN_ID"]
             );
         }

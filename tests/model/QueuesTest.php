@@ -6,7 +6,7 @@ use function PHPUnit\Framework\assertTrue;
 
 include __DIR__ . "/../../bootstrap/env.php";
 
-class QueueTest extends TestCase
+class QueuesTest extends TestCase
 {
     public function testSetQueue()
     {
@@ -42,5 +42,15 @@ class QueueTest extends TestCase
         var_dump($sm->get_error());
 
         assertTrue($result);
+    }
+
+    public function testCanGetProcessing()
+    {
+        $sm = new Queues();
+        $result = $sm->get_processing_count();
+        var_dump($sm->get_error());
+        var_dump($result);
+
+        $this->assertIsNumeric($result);
     }
 }

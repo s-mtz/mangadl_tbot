@@ -86,6 +86,26 @@ class Queues extends ModelAbstract
         return false;
     }
 
+    public function get_processing_count()
+    {
+        $sql = "SELECT COUNT(*) FROM `queue` WHERE `status`='processing'";
+        if (!($query = $this->conn->query($sql))) {
+            $this->error["message"] = "couldnt connect to database";
+            return false;
+        }
+
+        if ($query->num_rows > 0) {
+            $data = $query->fetch_all(MYSQLI_ASSOC);
+            if (empty($data)) {
+                $this->error["message"] = "couldnt find the queue in database";
+                return false;
+            }
+            return $data[0]["COUNT(*)"];
+        }
+        $this->error["message"] = "there is nothing in database";
+        return false;
+    }
+
     /**
      * [get_error description]
      *

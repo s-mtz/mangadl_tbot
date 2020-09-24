@@ -85,13 +85,15 @@ class Telegram
                 ],
             ],
         ]);
-
         if ($res->getStatusCode() !== 200) {
             $this->error["message"] = "couldent send_file_request to the api";
             return false;
         }
 
-        if ($response = json_decode($res->getBody()->getContents(), true) === true);
+        $response = json_decode($res->getBody()->getContents(), true);
+        if (!$response["ok"]) {
+            $this->error["message"] = "TG Error is :" . $response["description"];
+        }
         return true;
     }
 
