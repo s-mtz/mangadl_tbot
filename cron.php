@@ -11,9 +11,11 @@ $client = new Client(['base_uri' => $_ENV["HOST"]]);
 $update_id = 0;
 
 foreach ($respon["result"] as $element) {
-    $client->post('bot', ['body' => json_encode($element)]);
+    $client->post('bot', ['body' => json_encode($element), "timeout" => 600]);
 
     $update_id = $element['update_id'];
 }
 
 $tg->proccess_request($update_id + 1);
+
+$client->post('queue/1', ["timeout" => 700]);

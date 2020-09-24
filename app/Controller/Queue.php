@@ -48,18 +48,26 @@ class Queue
         return true;
     }
 
+    private function error_function($_message, $_chat_id)
+    {
+        $tg = new Telegram();
+        $this->error["message"] = $_message;
+        $tg->send_message_request($_chat_id, $_message);
+        return false;
+    }
+
     public function run(int $count = null)
     {
+        $tg = new Telegram();
+        $tg->send_message_request("476080724", "HO");
         $Q = new Queues();
         $download = new Manga();
-        $tg = new Telegram();
-        if (!($manga_q = $Q->get_queue("pending"))) {
-            $this->error["message"] = "there is no pending queue";
+        $manga_q = $Q->get_queue("pending");
+        if (!$manga_q) {
             return false;
         }
         if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "pending", "processing")) {
-            $this->error["message"] = "error happend in update pending to processing";
-            return false;
+            return $this->error_function("Couldn't proccess your job", $manga_q['chat_id']);
         }
         if (
             !$download->downloader(
@@ -69,12 +77,14 @@ class Queue
                 ABSPATH . "upload/"
             )
         ) {
-            $this->error["message"] = "couldent use the downloader";
-            return false;
-        }
-        if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "processing", "finished")) {
-            $this->error["message"] = "error happend in update processing to finished";
-            return false;
+            $this->error_function("There is a problem in donwloading files", $manga_q['chat_id']);
+            return $this->error_function(
+                "There is a problem in donwloading files " .
+                    $manga_q['id'] .
+                    " ERROR : " .
+                    $download->get_error(),
+                $_ENV["ADMIN_ID"]
+            );
         }
         if (
             !$tg->send_file_request(
@@ -93,8 +103,16 @@ class Queue
                     ".pdf"
             )
         ) {
-            $this->error["message"] = "couldnt upload the file";
-            return false;
+            return $this->error_function(
+                "There is a problem in sending the files",
+                $manga_q['chat_id']
+            );
+        }
+        if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "processing", "finished")) {
+            return $this->error_function(
+                "Problem in complete queue Q id : " . $manga_q['id'],
+                $_ENV["ADMIN_ID"]
+            );
         }
         return true;
     }

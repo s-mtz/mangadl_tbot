@@ -20,16 +20,7 @@ class UserTest extends TestCase
     public function testGetUser()
     {
         $sm = new User();
-        $result = $sm->get_user("470001");
-        var_dump($sm->get_error());
-
-        assertTrue(is_array($result));
-    }
-
-    public function testUpdateType()
-    {
-        $sm = new User();
-        $result = $sm->update_type("470001", "permuim", "super_perium");
+        $result = $sm->find_user("470001");
         var_dump($sm->get_error());
 
         assertTrue($result);

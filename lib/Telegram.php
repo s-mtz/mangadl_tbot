@@ -33,6 +33,10 @@ class Telegram
         $response = $this->client->get('getUpdates', [
             "query" => ["offset" => $offset],
         ]);
+        if (!$response) {
+            $this->error["message"] = "couldent get the update";
+            return false;
+        }
         $updates = json_decode($response->getBody(), true);
         return $updates;
     }

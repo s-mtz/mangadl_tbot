@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 use App\Model\Messages;
+use App\Model\User;
 use Lib\Telegram;
-
+use App\Controller\Queue;
 use MangaCrawlers\Validator;
 
 class Message
@@ -11,7 +12,9 @@ class Message
     private $error = [];
     private $request;
     private $db;
+    private $usr;
     private $tg;
+    private $Q;
     private $arr = ["start" => "/start", "help" => "/help"];
 
     public function __construct()
@@ -19,10 +22,19 @@ class Message
         $this->request = new Validator();
         $this->db = new Messages();
         $this->tg = new Telegram();
+        $this->usr = new User();
+        $this->Q = new Queue();
     }
 
     public function listen($_bot)
     {
+        if (!$this->usr->find_user($_bot['from']['id'])) {
+            if ($this->usr->new_user($_bot['from']['id'], $_bot['date'])) {
+                $this->error["message"] = "couldnt add the new user to database";
+                return false;
+            }
+        }
+
         if (in_array($_bot['text'], $this->arr)) {
             $this->Start_Helper($_bot, $this->arr);
             return true;
@@ -37,7 +49,11 @@ class Message
         } elseif ($result['type'] == 'manga') {
             return $this->chapter_start_check($_bot);
         } elseif ($result['type'] == 'chapter_start') {
-            return $this->chapter_finish_check($_bot);
+            $messages = $this->chapter_finish_check($_bot);
+            if ($messages) {
+                return $this->Q->get_mesage_threrade($_bot['from']['id']);
+            }
+            return false;
         }
     }
 
@@ -134,7 +150,7 @@ class Message
             );
             $this->tg->send_message_request(
                 $_bot['from']['id'],
-                "the finishing chpter has been set"
+                "the finishing chpter has been set\nplease wite untill we send you the files you asked for"
             );
             return true;
         }
