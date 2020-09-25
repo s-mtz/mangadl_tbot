@@ -4,7 +4,7 @@ namespace app\Model;
 
 use Lib\Core\Model as ModelAbstract;
 
-class Manga extends ModelAbstract
+class Mangas extends ModelAbstract
 {
     private $error = [];
 
@@ -44,7 +44,7 @@ class Manga extends ModelAbstract
         $where = "";
         $where .= empty($_crawler) ? "" : "crawler = '{$_crawler}'  and";
 
-        $sql = "SELECT crawler, manga, chapter FROM manga 
+        $sql = "SELECT * FROM manga 
                 WHERE {$where} manga = '{$_manga}' and chapter = $_chapter";
 
         $query = $this->conn->query($sql);
@@ -55,7 +55,7 @@ class Manga extends ModelAbstract
                 $this->error["message"] = "couldnt find the manga in database";
                 return false;
             }
-            return $data;
+            return $data[0];
         }
         $this->error["message"] = "there is nothing in database";
         return false;

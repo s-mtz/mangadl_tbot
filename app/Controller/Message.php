@@ -28,7 +28,6 @@ class Message
 
     public function listen($_bot)
     {
-        $this->tg->send_message_request($_ENV["ADMIN_ID"], "i'm testing ");
         if (!$this->usr->find_user($_bot['from']['id'])) {
             $this->tg->send_message_request($_ENV["ADMIN_ID"], "there is not user");
             $this->tg->send_message_request($_ENV["ADMIN_ID"], $_bot['date']);

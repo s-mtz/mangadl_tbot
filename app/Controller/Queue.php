@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Controller;
+
 use App\Model\Messages;
 use App\Model\Queues;
+use App\Model\Mangas;
 use Lib\Telegram;
 
 use MangaCrawlers\Manga;
@@ -15,6 +17,9 @@ class Queue
     {
         $msg = new Messages();
         $Q = new Queues();
+        $tg = new Telegram();
+        $manga = new Mangas();
+
         if (!($querry = $msg->get_all_messages($_chat_id))) {
             $this->error["message"] = "couldnt do get_all_messages";
             return false;
@@ -25,19 +30,24 @@ class Queue
         // later on add the > if(type == 1) to handel normal and vip
 
         for ($i = $start_chapter; $i <= $finish_chapter; $i++) {
-            if (
-                !$Q->set_queue(
-                    $_chat_id,
-                    $querry[0]['content'],
-                    $querry[1]['content'],
-                    $i,
-                    1,
-                    time(),
-                    "pending"
-                )
-            ) {
-                $this->error["message"] = "couldnt do set_queue properly";
-                return false;
+            $manga_existance = $manga->get_manga($querry[1]['content'], $i);
+            if (!is_array($manga_existance)) {
+                if (
+                    !$Q->set_queue(
+                        $_chat_id,
+                        $querry[0]['content'],
+                        $querry[1]['content'],
+                        $i,
+                        1,
+                        time(),
+                        "pending"
+                    )
+                ) {
+                    $this->error["message"] = "couldnt do set_queue properly";
+                    return false;
+                }
+            } else {
+                $tg->send_file_id_request($_chat_id, $manga_existance['dir']);
             }
         }
 
@@ -60,6 +70,8 @@ class Queue
     {
         $tg = new Telegram();
         $Q = new Queues();
+        $manga = new Mangas();
+
         if ($Q->get_processing_count() > $_count) {
             return null;
         }
@@ -92,23 +104,24 @@ class Queue
                 $_ENV["ADMIN_ID"]
             );
         }
-        if (
-            !$tg->send_file_request(
-                $manga_q['chat_id'],
-                ABSPATH .
-                    "upload/" .
-                    $manga_q['crawler'] .
-                    "/" .
-                    $manga_q['manga'] .
-                    "/" .
-                    $manga_q['chapter'] .
-                    "/" .
-                    $manga_q['manga'] .
-                    " " .
-                    $manga_q['chapter'] .
-                    ".pdf"
-            )
-        ) {
+
+        $message = $tg->send_file_request(
+            $manga_q['chat_id'],
+            ABSPATH .
+                "upload/" .
+                $manga_q['crawler'] .
+                "/" .
+                $manga_q['manga'] .
+                "/" .
+                $manga_q['chapter'] .
+                "/" .
+                $manga_q['manga'] .
+                "_" .
+                $manga_q['chapter'] .
+                ".pdf"
+        );
+
+        if (!$message) {
             $this->error_function("There is a problem in sending the files", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in SendFile  " .
@@ -116,6 +129,14 @@ class Queue
                     " ERROR : " .
                     $tg->get_error(),
                 $_ENV["ADMIN_ID"]
+            );
+        } else {
+            $manga->set_manga(
+                $message['file_id'],
+                $manga_q['crawler'],
+                $manga_q['manga'],
+                $manga_q['chapter'],
+                time()
             );
         }
         if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "processing", "finished")) {

@@ -93,6 +93,31 @@ class Telegram
         $response = json_decode($res->getBody()->getContents(), true);
         if (!$response["ok"]) {
             $this->error["message"] = "TG Error is :" . $response["description"];
+            return false;
+        }
+        return $response['result']['document'];
+    }
+
+    public function send_file_id_request(int $_chat_id, string $_file_id)
+    {
+        $res = $this->client->post('sendDocument', [
+            'multipart' => [
+                ['name' => 'chat_id', 'contents' => $_chat_id],
+                [
+                    'name' => 'document',
+                    'contents' => $_file_id,
+                ],
+            ],
+        ]);
+        if ($res->getStatusCode() !== 200) {
+            $this->error["message"] = "couldent send_file_id_request to the api";
+            return false;
+        }
+
+        $response = json_decode($res->getBody()->getContents(), true);
+        if (!$response["ok"]) {
+            $this->error["message"] = "TG Error is :" . $response["description"];
+            return false;
         }
         return true;
     }

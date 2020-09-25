@@ -17,5 +17,3 @@ foreach ($respon["result"] as $element) {
 }
 
 $tg->proccess_request($update_id + 1);
-
-// $client->post('queue/1', ["timeout" => 700]);
