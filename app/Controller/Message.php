@@ -28,8 +28,11 @@ class Message
 
     public function listen($_bot)
     {
+        $this->tg->send_message_request($_ENV["ADMIN_ID"], "i'm testing ");
         if (!$this->usr->find_user($_bot['from']['id'])) {
-            if ($this->usr->new_user($_bot['from']['id'], $_bot['date'])) {
+            $this->tg->send_message_request($_ENV["ADMIN_ID"], "there is not user");
+            $this->tg->send_message_request($_ENV["ADMIN_ID"], $_bot['date']);
+            if (!$this->usr->new_user($_bot['from']['id'], $_bot['date'])) {
                 $this->error["message"] = "couldnt add the new user to database";
                 return false;
             }
