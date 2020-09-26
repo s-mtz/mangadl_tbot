@@ -5,4 +5,4 @@ use GuzzleHttp\Client;
 
 $client = new Client(['base_uri' => $_ENV["HOST"]]);
 
-$client->post('queue/1', ["timeout" => 700]);
+$client->post('queue/3', ["timeout" => 700]);
