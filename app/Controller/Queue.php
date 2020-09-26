@@ -83,7 +83,10 @@ class Queue
         if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "pending", "processing")) {
             $this->error_function("Couldn't proccess your job", $manga_q['chat_id']);
             return $this->error_function(
-                "There is a problem in DB  " . $manga_q['id'] . " ERROR : " . $Q->get_error(),
+                "There is a problem in DB  " .
+                    $manga_q['id'] .
+                    " ERROR : " .
+                    json_encode($Q->get_error()),
                 $_ENV["ADMIN_ID"]
             );
         }
@@ -100,7 +103,7 @@ class Queue
                 "There is a problem in donwloading files " .
                     $manga_q['id'] .
                     " ERROR : " .
-                    $download->get_error(),
+                    json_encode($download->get_error()),
                 $_ENV["ADMIN_ID"]
             );
         }
@@ -127,7 +130,7 @@ class Queue
                 "There is a problem in SendFile  " .
                     $manga_q['id'] .
                     " ERROR : " .
-                    $tg->get_error(),
+                    json_encode($tg->get_error()),
                 $_ENV["ADMIN_ID"]
             );
         } else {
@@ -144,7 +147,7 @@ class Queue
                 "Problem in complete queue Q id : " .
                     $manga_q['id'] .
                     " ERROR : " .
-                    $Q->get_error(),
+                    json_encode($Q->get_error()),
                 $_ENV["ADMIN_ID"]
             );
         }
