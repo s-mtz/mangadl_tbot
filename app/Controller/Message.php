@@ -60,11 +60,18 @@ class Message
     private function Start_Helper($_bot, $_arr)
     {
         if (array_search($_bot['text'], $_arr) == "start") {
-            $this->tg->send_message_request($_bot['from']['id'], "welcome to the bot");
+            $this->tg->send_message_request(
+                $_bot['from']['id'],
+                "welcome to the bot\n\n use /help for more information"
+            );
             return true;
         }
         if (array_search($_bot['text'], $_arr) == "help") {
-            $this->tg->send_message_request($_bot['from']['id'], "send your request");
+            $this->tg->send_message_request(
+                $_bot['from']['id'],
+                "first things first the only existing crawler at the momment is mangapanda.com so for the first message and setting the crawler send the messange -> mangapanda\n\nthe second thing needed is the mangapanda at so go to the mangapanda.com and choose the manga you want and enter it here but in this way:\nshingeki-no-kyojin
+            use - instead of space\n\n then you need to send the starting and finishing chapter as a single number\n\n have fun as long as its free for test ;)"
+            );
             return true;
         }
     }
