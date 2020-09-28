@@ -10,13 +10,10 @@ class Users
 
     private $UM;
 
-    public function __construct()
-    {
-        $this->UM = new UsersMeta();
-    }
-
     public function set_vip(string $_chat_id)
     {
+        $this->UM = new UsersMeta();
+
         if (!$this->UM->add_meta($_chat_id, "vip", strtotime('+1 month', time()))) {
             $this->error["message"] = "couldnt connect set_vip to usermeta database";
             return false;
@@ -26,6 +23,8 @@ class Users
 
     public function is_vip(string $_chat_id)
     {
+        $this->UM = new UsersMeta();
+
         $value = $this->UM->get_value($_chat_id, "vip");
         if (!$value) {
             return false;
