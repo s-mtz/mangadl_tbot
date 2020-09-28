@@ -54,7 +54,18 @@ class Queue
                     return false;
                 }
             } else {
-                if ($tg->send_file_id_request($_chat_id, $manga_existance['dir'])) {
+                if (
+                    $tg->send_file_id_request_pdf(
+                        $_chat_id,
+                        $manga_existance['pdf_id'],
+                        $querry[1]['content'] . " ch " . $i . " PDF"
+                    ) &&
+                    $tg->send_file_id_request_zip(
+                        $_chat_id,
+                        $manga_existance['zip_id'],
+                        $querry[1]['content'] . " ch " . $i . " ZIP"
+                    )
+                ) {
                     if (
                         !$Q->set_queue(
                             $_chat_id,
