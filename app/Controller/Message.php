@@ -14,6 +14,7 @@ class Message
     private $request;
     private $db;
     private $usr;
+    private $user_vip;
     private $tg;
     private $Q;
     private $arr = ["start" => "/start", "help" => "/help"];
