@@ -6,6 +6,7 @@ use App\Model\Messages;
 use App\Model\Queues;
 use App\Model\Mangas;
 use Lib\Telegram;
+use APP\Controller\User;
 
 use MangaCrawlers\Manga;
 
@@ -19,15 +20,21 @@ class Queue
         $Q = new Queues();
         $tg = new Telegram();
         $manga = new Mangas();
+        $usr = new User();
 
         if (!($querry = $msg->get_all_messages($_chat_id))) {
             $this->error["message"] = "couldnt do get_all_messages";
             return false;
         }
         $start_chapter = $querry[2]['content'];
-        $finish_chapter = $querry[3]['content'];
 
-        // later on add the > if(type == 1) to handel normal and vip
+        //add vip func
+
+        if ($this->usr->is_vip($_chat_id)) {
+            $finish_chapter = $querry[3]['content'];
+        } else {
+            $finish_chapter = $querry[2]['content'];
+        }
 
         for ($i = $start_chapter; $i <= $finish_chapter; $i++) {
             $manga_existance = $manga->get_manga($querry[1]['content'], $i);
@@ -47,7 +54,24 @@ class Queue
                     return false;
                 }
             } else {
-                $tg->send_file_id_request($_chat_id, $manga_existance['dir']);
+                if ($tg->send_file_id_request($_chat_id, $manga_existance['dir'])) {
+                    if (
+                        !$Q->set_queue(
+                            $_chat_id,
+                            $querry[0]['content'],
+                            $querry[1]['content'],
+                            $i,
+                            1,
+                            time(),
+                            "finished"
+                        )
+                    ) {
+                        $this->error["message"] = "couldnt do set_queue properly";
+                        return false;
+                    }
+                }
+                $this->error["message"] = "couldnt do send_file_id_request properly";
+                return false;
             }
         }
 
@@ -80,7 +104,7 @@ class Queue
         if (!$manga_q) {
             return false;
         }
-        if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "pending", "processing")) {
+        if (!$Q->update_queue($manga_q['id'], "processing")) {
             $this->error_function("Couldn't proccess your job", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in DB  " .
@@ -108,7 +132,7 @@ class Queue
             );
         }
 
-        $message = $tg->send_file_request(
+        $messageZIP = $tg->send_file_request(
             $manga_q['chat_id'],
             ABSPATH .
                 "upload/" .
@@ -121,10 +145,28 @@ class Queue
                 $manga_q['manga'] .
                 "_" .
                 $manga_q['chapter'] .
-                ".pdf"
+                ".zip",
+            $manga_q['manga'] . " ch " . $manga_q['chapter'] . " ZIP"
         );
 
-        if (!$message) {
+        $messagePDF = $tg->send_file_request(
+            $manga_q['chat_id'],
+            ABSPATH .
+                "upload/" .
+                $manga_q['crawler'] .
+                "/" .
+                $manga_q['manga'] .
+                "/" .
+                $manga_q['chapter'] .
+                "/" .
+                $manga_q['manga'] .
+                "_" .
+                $manga_q['chapter'] .
+                ".pdf",
+            $manga_q['manga'] . " ch " . $manga_q['chapter'] . " PDF"
+        );
+
+        if (!$messagePDF || !$messageZIP) {
             $this->error_function("There is a problem in sending the files", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in SendFile  " .
@@ -135,14 +177,16 @@ class Queue
             );
         } else {
             $manga->set_manga(
-                $message['file_id'],
+                $messagePDF['file_id'],
+                $messageZIP['file_id'],
                 $manga_q['crawler'],
                 $manga_q['manga'],
                 $manga_q['chapter'],
                 time()
             );
         }
-        if (!$Q->update_queue($manga_q['id'], $manga_q['chat_id'], "processing", "finished")) {
+
+        if (!$Q->update_queue($manga_q['id'], "finished")) {
             return $this->error_function(
                 "Problem in complete queue Q id : " .
                     $manga_q['id'] .
