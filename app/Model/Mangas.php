@@ -14,14 +14,15 @@ class Mangas extends ModelAbstract
      * @return  [type]  [return description]
      */
     public function set_manga(
-        string $_dir,
+        string $_pdf_id,
+        string $_zip_id,
         string $_crawler,
         string $_manga,
         int $_chapter,
         int $_time
     ) {
-        $sql = "INSERT INTO manga (dir, crawler, manga, chapter, time) 
-                VALUES ('{$_dir}', '{$_crawler}', '{$_manga}', $_chapter, $_time)";
+        $sql = "INSERT INTO manga (pdf_id, zip_id, crawler, manga, chapter, time) 
+                VALUES ('{$_pdf_id}','{$_zip_id}', '{$_crawler}', '{$_manga}', {$_chapter}, {$_time})";
 
         if ($this->conn->query($sql) === false) {
             $this->error["message"] = "couldnt send set_manga query to database";
