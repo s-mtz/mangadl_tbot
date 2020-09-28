@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Model\UsersMeta;
 
-class User
+class Users
 {
     private $error = [];
 

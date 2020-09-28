@@ -6,8 +6,7 @@ use App\Model\Messages;
 use App\Model\Queues;
 use App\Model\Mangas;
 use Lib\Telegram;
-use App\Controller\User;
-
+use app\Controller\Users;
 use MangaCrawlers\Manga;
 
 class Queue
@@ -20,7 +19,7 @@ class Queue
         $Q = new Queues();
         $tg = new Telegram();
         $manga = new Mangas();
-        $usr = new User();
+        $user = new Users();
 
         $querry = $msg->get_all_messages($_chat_id);
         if (!$querry) {
@@ -31,7 +30,7 @@ class Queue
 
         //add vip func
 
-        if ($this->usr->is_vip($_chat_id)) {
+        if ($this->user->is_vip($_chat_id)) {
             $finish_chapter = $querry[3]['content'];
         } else {
             $finish_chapter = $querry[2]['content'];
