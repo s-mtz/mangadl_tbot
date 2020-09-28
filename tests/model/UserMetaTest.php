@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use App\Model\UserMeta;
+use App\Model\UsersMeta;
 
 use function PHPUnit\Framework\assertTrue;
 
@@ -10,7 +10,7 @@ class UserMetaTest extends TestCase
 {
     public function testAddMeta()
     {
-        $sm = new UserMeta();
+        $sm = new UsersMeta();
         $result = $sm->add_meta("470001", "hello", "2");
         var_dump($sm->get_error());
 
@@ -19,7 +19,7 @@ class UserMetaTest extends TestCase
 
     public function testGetValue()
     {
-        $sm = new UserMeta();
+        $sm = new UsersMeta();
         $result = $sm->get_value("470001", "hello");
         var_dump($sm->get_error());
 
