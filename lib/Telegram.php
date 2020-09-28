@@ -74,7 +74,7 @@ class Telegram
      *
      * @return  [type]             [return description]
      */
-    public function send_file_request(int $_chat_id, string $_path)
+    public function send_file_request(int $_chat_id, string $_path, string $_caption)
     {
         $res = $this->client->post('sendDocument', [
             'multipart' => [
@@ -82,6 +82,10 @@ class Telegram
                 [
                     'name' => 'document',
                     'contents' => fopen($_path, 'r'),
+                ],
+                [
+                    'name' => 'caption',
+                    'contents' => $_caption,
                 ],
             ],
         ]);
