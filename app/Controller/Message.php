@@ -5,6 +5,7 @@ use App\Model\Messages;
 use App\Model\User;
 use Lib\Telegram;
 use App\Controller\Queue;
+use App\Controller\Users;
 use MangaCrawlers\Validator;
 
 class Message
@@ -24,6 +25,7 @@ class Message
         $this->tg = new Telegram();
         $this->usr = new User();
         $this->Q = new Queue();
+        $this->user_vip = new Queue();
     }
 
     public function listen($_bot)
@@ -155,11 +157,19 @@ class Message
                 'chapter_finish',
                 $_bot['date']
             );
-            $this->tg->send_message_request(
-                $_bot['from']['id'],
-                "the finishing chpter has been set\nplease wite untill we send you the files you asked for"
-            );
-            return true;
+            if ($this->user_vip->is_vip($_bot['from']['id'])) {
+                $this->tg->send_message_request(
+                    $_bot['from']['id'],
+                    "as VIP member we will send you all the files you asked for"
+                );
+                return true;
+            } else {
+                $this->tg->send_message_request(
+                    $_bot['from']['id'],
+                    "only the starting chapter would be sent to you\nto queue all the requset at one please purchase the VIP membership"
+                );
+                return true;
+            }
         }
         $this->tg->send_message_request(
             $_bot['from']['id'],
