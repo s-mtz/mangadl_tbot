@@ -6,7 +6,7 @@ use App\Model\Messages;
 use App\Model\Queues;
 use App\Model\Mangas;
 use Lib\Telegram;
-use APP\Controller\User;
+use App\Controller\User;
 
 use MangaCrawlers\Manga;
 
@@ -22,7 +22,8 @@ class Queue
         $manga = new Mangas();
         $usr = new User();
 
-        if (!($querry = $msg->get_all_messages($_chat_id))) {
+        $querry = $msg->get_all_messages($_chat_id);
+        if (!$querry) {
             $this->error["message"] = "couldnt do get_all_messages";
             return false;
         }
