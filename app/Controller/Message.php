@@ -25,7 +25,7 @@ class Message
         $this->tg = new Telegram();
         $this->usr = new User();
         $this->Q = new Queue();
-        $this->user_vip = new Queue();
+        $this->user_vip = new Users();
     }
 
     public function listen($_bot)
