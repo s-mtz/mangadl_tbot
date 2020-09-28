@@ -39,8 +39,6 @@ class Queues extends ModelAbstract
      */
     public function get_queue($_status)
     {
-        // need ro be fixed i dont get how to set the get updates its so confusing po
-
         $sql = "SELECT * FROM queue WHERE status = '{$_status}'
                 ORDER BY type DESC LIMIT 1";
 
@@ -70,14 +68,10 @@ class Queues extends ModelAbstract
      *
      * @return  [type]                [return description]
      */
-    public function update_queue(
-        int $_id,
-        string $_chat_id,
-        string $_old_status,
-        string $_new_status
-    ) {
+    public function update_queue(int $_id, string $_new_status)
+    {
         $sql = "UPDATE queue SET status = '{$_new_status}' 
-                WHERE chat_id = '{$_chat_id}' and status = '{$_old_status}' and id = $_id";
+                WHERE  id = $_id";
 
         if ($this->conn->query($sql) === true) {
             return true;
