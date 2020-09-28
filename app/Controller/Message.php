@@ -69,8 +69,8 @@ class Message
         if (array_search($_bot['text'], $_arr) == "help") {
             $this->tg->send_message_request(
                 $_bot['from']['id'],
-                "first things first the only existing crawler at the momment is mangapanda.com so for the first message and setting the crawler send the messange -> mangapanda\n\nthe second thing needed is the mangapanda at so go to the mangapanda.com and choose the manga you want and enter it here but in this way:\nshingeki-no-kyojin
-            use - instead of space\n\n then you need to send the starting and finishing chapter as a single number\n\n have fun as long as its free for test ;)"
+                "first things first the only existing crawler at the momment is mangapanda.com so for the first message and setting the crawler send the messange -> mangapanda\n\nthe second thing needed is the mangapanda at so go to the mangapanda.com and choose the manga you want and enter it here but in this way:\n`shingeki-no-kyojin`\n ✅\nand not like this:\n`shingeki no kyojin`❌
+                \n⭕️ use - instead of space ⭕️\n\nthen you need to send the starting and finishing chapter as a single number\n\nenjoy downloading manga freely ;)"
             );
             return true;
         }
