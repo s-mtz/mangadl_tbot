@@ -19,7 +19,7 @@ class Queue
         $Q = new Queues();
         $tg = new Telegram();
         $manga = new Mangas();
-        $user = new Users();
+        $user_vip = new Users();
 
         $querry = $msg->get_all_messages($_chat_id);
         if (!$querry) {
@@ -30,7 +30,7 @@ class Queue
 
         //add vip func
 
-        if ($user->is_vip($_chat_id)) {
+        if ($user_vip->is_vip($_chat_id)) {
             $finish_chapter = $querry[3]['content'];
         } else {
             $finish_chapter = $querry[2]['content'];
