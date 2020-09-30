@@ -3,36 +3,60 @@
 namespace App\Controller;
 use App\Model\Messages;
 use App\Model\User;
+use App\Controller\Users;
+use App\Model\UsersMeta;
 use Lib\Telegram;
 use App\Controller\Queue;
-use App\Controller\Users;
+use I18n;
 use MangaCrawlers\Validator;
 
 class Message
 {
     private $error = [];
     private $request;
+    private $meta;
+    private $user_meta;
     private $db;
-    private $usr;
-    private $user_vip;
+    private $user;
     private $tg;
     private $Q;
-    private $arr = ["start" => "/start", "help" => "/help"];
+    private $arr = [
+        "start" => "/start",
+        "help" => "/help",
+        "English" => "/english",
+        "Persian" => "/persian",
+    ];
 
     public function __construct()
     {
         $this->request = new Validator();
+        $this->meta = new UsersMeta();
         $this->db = new Messages();
         $this->tg = new Telegram();
-        $this->usr = new User();
+        $this->user = new User();
+        $this->user_meta = new Users();
         $this->Q = new Queue();
-        $this->user_vip = new Users();
     }
 
     public function listen($_bot)
     {
-        if (!$this->usr->find_user($_bot['from']['id'])) {
-            if (!$this->usr->new_user($_bot['from']['id'], $_bot['date'])) {
+        $language = $this->meta->get_value($_bot['from']['id'], "language");
+        switch ($language) {
+            case 'En_us':
+                I18n::set_language("En_us");
+                break;
+
+            case 'Fa_ir':
+                I18n::set_language("Fa_ir");
+                break;
+
+            default:
+                I18n::set_language("En_us");
+                break;
+        }
+
+        if (!$this->user->find_user($_bot['from']['id'])) {
+            if (!$this->user->new_user($_bot['from']['id'], $_bot['date'])) {
                 $this->error["message"] = "couldnt add the new user to database";
                 return false;
             }
@@ -63,18 +87,23 @@ class Message
     private function Start_Helper($_bot, $_arr)
     {
         if (array_search($_bot['text'], $_arr) == "start") {
-            $this->tg->send_message_request(
-                $_bot['from']['id'],
-                "welcome to the bot\n\n use /help for more information"
-            );
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("start"));
             return true;
         }
         if (array_search($_bot['text'], $_arr) == "help") {
-            $this->tg->send_message_request(
-                $_bot['from']['id'],
-                "first things first the only existing crawler at the momment is mangapanda.com so for the first message and setting the crawler send the messange -> mangapanda\n\nthe second thing needed is the mangapanda at so go to the mangapanda.com and choose the manga you want and enter it here but in this way:\n`shingeki-no-kyojin`\n ✅\nand not like this:\n`shingeki no kyojin`❌
-                \n⭕️ use - instead of space ⭕️\n\nthen you need to send the starting and finishing chapter as a single number\n\nenjoy downloading manga freely ;)"
-            );
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("help"));
+            return true;
+        }
+        if (array_search($_bot['text'], $_arr) == "English") {
+            $this->user_meta->set_meta($_bot['from']['id'], "language", "English");
+            I18n::set_language('En_us');
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("English"));
+            return true;
+        }
+        if (array_search($_bot['text'], $_arr) == "Persian") {
+            $this->user_meta->set_meta($_bot['from']['id'], "language", "Persian");
+            I18n::set_language('Fa_ir');
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("Persian"));
             return true;
         }
     }
@@ -83,13 +112,10 @@ class Message
     {
         if ($this->request->check_crawler($_bot['text'])) {
             $this->db->set_messages($_bot['from']['id'], $_bot['text'], 'crawler', $_bot['date']);
-            $this->tg->send_message_request(
-                $_bot['from']['id'],
-                "the crawler has been set secsusfully"
-            );
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("Crawler_success"));
             return true;
         }
-        $this->tg->send_message_request($_bot['from']['id'], "please send the crawler correctly");
+        $this->tg->send_message_request($_bot['from']['id'], I18n::get("Crawler_error"));
         $this->error["message"] = "didnt recive the right crawler name";
         return false;
     }
@@ -103,13 +129,10 @@ class Message
             )
         ) {
             $this->db->set_messages($_bot['from']['id'], $_bot['text'], 'manga', $_bot['date']);
-            $this->tg->send_message_request(
-                $_bot['from']['id'],
-                "the manga has been set secsusfully"
-            );
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("Manga_success"));
             return true;
         }
-        $this->tg->send_message_request($_bot['from']['id'], "please send the manga correctly");
+        $this->tg->send_message_request($_bot['from']['id'], I18n::get("Manga_error"));
         $this->error["message"] = "didnt recive the right manga name";
         return false;
     }
@@ -131,14 +154,11 @@ class Message
             );
             $this->tg->send_message_request(
                 $_bot['from']['id'],
-                "the starting chpter has been set"
+                I18n::get("Starting_chapter_success")
             );
             return true;
         }
-        $this->tg->send_message_request(
-            $_bot['from']['id'],
-            "please send the starting chapter correctly"
-        );
+        $this->tg->send_message_request($_bot['from']['id'], I18n::get("Starting_chapter_error"));
         $this->error["message"] = "didnt recive the right starting chapter";
         return false;
     }
@@ -158,24 +178,21 @@ class Message
                 'chapter_finish',
                 $_bot['date']
             );
-            if ($this->user_vip->is_vip($_bot['from']['id'])) {
+            if ($this->meta->get_value($_bot['from']['id'], "vip") >= time()) {
                 $this->tg->send_message_request(
                     $_bot['from']['id'],
-                    "as VIP member we will send you all the files you asked for"
+                    I18n::get("Finishing_chapter_success_VIP")
                 );
                 return true;
             } else {
                 $this->tg->send_message_request(
                     $_bot['from']['id'],
-                    "only the starting chapter would be sent to you\nto queue all the requset at one please purchase the VIP membership"
+                    I18n::get("Finishing_chapter_success_NORMAL")
                 );
                 return true;
             }
         }
-        $this->tg->send_message_request(
-            $_bot['from']['id'],
-            "please send the starting chapter correctly"
-        );
+        $this->tg->send_message_request($_bot['from']['id'], I18n::get("Finishing_chapter_error"));
         $this->error["message"] = "didnt recive the right finishing chapter";
         return false;
     }
