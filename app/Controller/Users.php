@@ -8,32 +8,40 @@ class Users
 {
     private $error = [];
 
-    private $UM;
+    private $user_meta;
 
-    public function set_vip(string $_chat_id)
+    /**
+     * [set_vip description]
+     *
+     * @param   string  $_chat_id  [$_chat_id description]
+     *
+     * @return  [type]             [return description]
+     */
+    public function set_meta(string $_chat_id, string $_key, string $_value)
     {
-        $this->UM = new UsersMeta();
+        $this->user_meta = new UsersMeta();
 
-        if (!$this->UM->add_meta($_chat_id, "vip", strtotime('+1 month', time()))) {
-            $this->error["message"] = "couldnt connect set_vip to usermeta database";
+        if (!is_string($this->user_meta->get_value($_chat_id, $_key))) {
+            if (!$this->user_meta->add_meta($_chat_id, $_key, $_value)) {
+                $this->error["message"] = "couldnt connect set_meta to usermeta database";
+                return false;
+            }
+            return true;
+        }
+        if (!$this->user_meta->update_meta($_chat_id, $_key, $_value)) {
+            $this->error["message"] = "couldnt connect set_meta to usermeta database";
             return false;
         }
         return true;
     }
 
-    public function is_vip(string $_chat_id)
-    {
-        $this->UM = new UsersMeta();
+    // $flag = (bool) (time() <= $expired_time);
 
-        $value = $this->UM->get_value($_chat_id, "vip");
-        if (!$value) {
-            return false;
-        }
-        $expired_time = $value['value'];
-        $flag = (bool) (time() <= $expired_time);
-        return $flag;
-    }
-
+    /**
+     * [get_error description]
+     *
+     * @return  [type]  [return description]
+     */
     public function get_error()
     {
         if (empty($this->error)) {
