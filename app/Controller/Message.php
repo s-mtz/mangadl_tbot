@@ -42,7 +42,7 @@ class Message
     {
         $language = $this->meta->get_value($_bot['from']['id'], "language");
 
-        if (is_null($language)) {
+        if ($language === false) {
             I18n::set_language("En_us");
         }
         if ($language == "Fa_ir") {
