@@ -2,7 +2,7 @@
 
 $messages = [];
 $messages["start"] =
-    "Welcome to Mnanga-dl\n\nPlease use /help command for more information about how to use the bot\n also join the bot's channel @Mangadl_tch for the news and updates";
+    "Welcome to Mnanga-dl\n\nPlease use /help command for more information about how to use the bot\nAlso join the bot's channel @Mangadl_tch for the news and updates";
 $messages[
     "help"
 ] = "first things first the only existing source at the momment is mangapanda.com and all the existing manga are accessble in the bot\n\nso for the first message and setting the source send the messange -> mangapanda\n\nthe second thing needed is the requsted manga so go to the mangapanda.com and choose the manga you want and enter it here but in this way:\n`shingeki-no-kyojin` ✅\nand not like this:\n`shingeki no kyojin` ❌
