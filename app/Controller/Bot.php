@@ -23,6 +23,7 @@ class Bot
         if (!$update) {
             return false;
         }
+        $this->tg->send_message_request($_ENV["ADMIN_ID"], $data);
         $sm = new Message();
         return $sm->listen($update['message']);
     }
