@@ -41,18 +41,15 @@ class Message
     public function listen($_bot)
     {
         $language = $this->meta->get_value($_bot['from']['id'], "language");
-        switch ($language) {
-            case 'En_us':
-                I18n::set_language("En_us");
-                break;
 
-            case 'Fa_ir':
-                I18n::set_language("Fa_ir");
-                break;
-
-            default:
-                I18n::set_language("En_us");
-                break;
+        if (is_null($language)) {
+            I18n::set_language("En_us");
+        }
+        if ($language == "Fa_ir") {
+            I18n::set_language("Fa_ir");
+        }
+        if ($language == "En_us") {
+            I18n::set_language("En_us");
         }
 
         if (!$this->user->find_user($_bot['from']['id'])) {
