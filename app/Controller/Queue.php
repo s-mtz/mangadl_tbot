@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Model\Messages;
 use App\Model\Queues;
+use App\Model\UsersMeta;
 use App\Model\Mangas;
 use Lib\Telegram;
-use App\Controller\Users;
 use MangaCrawlers\Manga;
 
 class Queue
@@ -19,7 +19,7 @@ class Queue
         $Q = new Queues();
         $tg = new Telegram();
         $manga = new Mangas();
-        $user_vip = new Users();
+        $meta = new UsersMeta();
 
         $querry = $msg->get_all_messages($_chat_id);
         if (!$querry) {
@@ -28,9 +28,7 @@ class Queue
         }
         $start_chapter = $querry[2]['content'];
 
-        //add vip func
-
-        if ($user_vip->is_vip($_chat_id)) {
+        if ($meta->get_value($_chat_id, "vip" >= time())) {
             $finish_chapter = $querry[3]['content'];
         } else {
             $finish_chapter = $querry[2]['content'];
@@ -80,6 +78,11 @@ class Queue
                         $this->error["message"] = "couldnt do set_queue properly";
                         return false;
                     }
+                    if (!$msg->finish($_chat_id)) {
+                        $this->error["message"] = "couldnt erase the message from database";
+                        return false;
+                    }
+                    return true;
                 }
                 $this->error["message"] = "couldnt do send_file_id_request properly";
                 return false;
