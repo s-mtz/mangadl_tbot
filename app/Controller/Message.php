@@ -92,13 +92,13 @@ class Message
             return true;
         }
         if (array_search($_bot['text'], $_arr) == "English") {
-            $this->user_meta->set_meta($_bot['from']['id'], "language", "English");
+            $this->user_meta->set_meta($_bot['from']['id'], "language", "En_us");
             I18n::set_language('En_us');
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("English"));
             return true;
         }
         if (array_search($_bot['text'], $_arr) == "Persian") {
-            $this->user_meta->set_meta($_bot['from']['id'], "language", "Persian");
+            $this->user_meta->set_meta($_bot['from']['id'], "language", "Fa_ir");
             I18n::set_language('Fa_ir');
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("Persian"));
             return true;
