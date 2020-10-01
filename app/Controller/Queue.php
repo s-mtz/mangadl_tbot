@@ -116,7 +116,6 @@ class Queue
         $download = new Manga();
         $manga_q = $Q->get_queue("pending");
         if (!$manga_q) {
-            $Q->update_queue($manga_q['id'], "error");
             return false;
         }
         if (!$Q->update_queue($manga_q['id'], "processing")) {
