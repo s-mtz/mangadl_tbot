@@ -6,7 +6,7 @@ $messages["start"] =
 $messages[
     "help"
 ] = "first things first the only existing source at the momment is mangapanda.com and all the existing manga are accessble in the bot\n\nso for the first message and setting the source send the messange -> mangapanda\n\nthe second thing needed is the requsted manga so go to the mangapanda.com and choose the manga you want and enter it here but in this way:\n`shingeki-no-kyojin` ✅\nand not like this:\n`shingeki no kyojin` ❌
-\n⭕️ use - instead of space ⭕️\n\nfot the next step you would be asked for the requsted starting chapter so enter the chapter you want as a single number like `1`\n\nthen you need to set the finishing chapter as well so the bot gets you all the chapters in between and again enter it as a single number like `5`\n\nthen you will recive chapters 1 - 2 - 3 - 4 - 5 of the manga shingeki-no-kyojin\n\nPlease note that only VIP memebers would recive all the chapters and as a normal user you would be granted with only the starting chapter you asked for";
+\n⭕️ use - instead of space ⭕️\n\nfot the next step you would be asked for the requsted starting chapter so enter the chapter you want as a single number like -> 1\n\nthen you need to set the finishing chapter as well so the bot gets you all the chapters in between and again enter it as a single number like -> 5\n\nthen you will recive chapters 1 - 2 - 3 - 4 - 5 of the manga shingeki-no-kyojin\n\nPlease note that only VIP memebers would recive all the chapters and as a normal user you would be granted with only the starting chapter you asked for";
 
 $messages["English"] = "you changed the language to English secussfully";
 
