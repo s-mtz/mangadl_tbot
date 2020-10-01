@@ -136,61 +136,77 @@ class Message
 
     private function chapter_start_check($_bot)
     {
-        if (
-            $this->request->check_chapter(
-                $this->db->get_last_messages($_bot['from']['id'], "crawler")['content'],
-                $this->db->get_last_messages($_bot['from']['id'], "manga")['content'],
-                intval($_bot['text'])
-            )
-        ) {
-            $this->db->set_messages(
-                $_bot['from']['id'],
-                $_bot['text'],
-                'chapter_start',
-                $_bot['date']
-            );
+        if (filter_var($_bot['text'], FILTER_VALIDATE_INT)) {
+            if (
+                $this->request->check_chapter(
+                    $this->db->get_last_messages($_bot['from']['id'], "crawler")['content'],
+                    $this->db->get_last_messages($_bot['from']['id'], "manga")['content'],
+                    intval($_bot['text'])
+                )
+            ) {
+                $this->db->set_messages(
+                    $_bot['from']['id'],
+                    $_bot['text'],
+                    'chapter_start',
+                    $_bot['date']
+                );
+                $this->tg->send_message_request(
+                    $_bot['from']['id'],
+                    I18n::get("Starting_chapter_success")
+                );
+                return true;
+            }
             $this->tg->send_message_request(
                 $_bot['from']['id'],
-                I18n::get("Starting_chapter_success")
+                I18n::get("Starting_chapter_error")
             );
-            return true;
+            $this->error["message"] = "didnt recive the right starting chapter";
+            return false;
         }
         $this->tg->send_message_request($_bot['from']['id'], I18n::get("Starting_chapter_error"));
-        $this->error["message"] = "didnt recive the right starting chapter";
+        $this->error["message"] = "didnt send starting chapter as an intiger";
         return false;
     }
 
     private function chapter_finish_check($_bot)
     {
-        if (
-            $this->request->check_chapter(
-                $this->db->get_last_messages($_bot['from']['id'], "crawler")['content'],
-                $this->db->get_last_messages($_bot['from']['id'], "manga")['content'],
-                intval($_bot['text'])
-            )
-        ) {
-            $this->db->set_messages(
-                $_bot['from']['id'],
-                $_bot['text'],
-                'chapter_finish',
-                $_bot['date']
-            );
-            if ($this->meta->get_value($_bot['from']['id'], "vip") >= time()) {
-                $this->tg->send_message_request(
+        if (filter_var($_bot['text'], FILTER_VALIDATE_INT)) {
+            if (
+                $this->request->check_chapter(
+                    $this->db->get_last_messages($_bot['from']['id'], "crawler")['content'],
+                    $this->db->get_last_messages($_bot['from']['id'], "manga")['content'],
+                    intval($_bot['text'])
+                )
+            ) {
+                $this->db->set_messages(
                     $_bot['from']['id'],
-                    I18n::get("Finishing_chapter_success_VIP")
+                    $_bot['text'],
+                    'chapter_finish',
+                    $_bot['date']
                 );
-                return true;
-            } else {
-                $this->tg->send_message_request(
-                    $_bot['from']['id'],
-                    I18n::get("Finishing_chapter_success_NORMAL")
-                );
-                return true;
+                if ($this->meta->get_value($_bot['from']['id'], "vip") >= time()) {
+                    $this->tg->send_message_request(
+                        $_bot['from']['id'],
+                        I18n::get("Finishing_chapter_success_VIP")
+                    );
+                    return true;
+                } else {
+                    $this->tg->send_message_request(
+                        $_bot['from']['id'],
+                        I18n::get("Finishing_chapter_success_NORMAL")
+                    );
+                    return true;
+                }
             }
+            $this->tg->send_message_request(
+                $_bot['from']['id'],
+                I18n::get("Finishing_chapter_error")
+            );
+            $this->error["message"] = "didnt recive the right finishing chapter";
+            return false;
         }
         $this->tg->send_message_request($_bot['from']['id'], I18n::get("Finishing_chapter_error"));
-        $this->error["message"] = "didnt recive the right finishing chapter";
+        $this->error["message"] = "didnt send finishing chapter as an intiger";
         return false;
     }
 
