@@ -116,9 +116,11 @@ class Queue
         $download = new Manga();
         $manga_q = $Q->get_queue("pending");
         if (!$manga_q) {
+            $Q->update_queue($manga_q['id'], "error");
             return false;
         }
         if (!$Q->update_queue($manga_q['id'], "processing")) {
+            $Q->update_queue($manga_q['id'], "error");
             $this->error_function("Couldn't proccess your job", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in DB  " .
@@ -136,6 +138,7 @@ class Queue
                 ABSPATH . "upload/"
             )
         ) {
+            $Q->update_queue($manga_q['id'], "error");
             $this->error_function("There is a problem in donwloading files", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in donwloading files " .
@@ -181,6 +184,7 @@ class Queue
         );
 
         if (!$messagePDF || !$messageZIP) {
+            $Q->update_queue($manga_q['id'], "error");
             $this->error_function("There is a problem in sending the files", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in SendFile  " .
@@ -201,6 +205,7 @@ class Queue
         }
 
         if (!$Q->update_queue($manga_q['id'], "finished")) {
+            $Q->update_queue($manga_q['id'], "error");
             return $this->error_function(
                 "Problem in complete queue Q id : " .
                     $manga_q['id'] .
