@@ -113,7 +113,7 @@ class Telegram
                 ],
                 [
                     'name' => 'caption',
-                    'contents' => $_caption,
+                    'contents' => $_caption . "\n@mangadl_tbot",
                 ],
             ],
         ]);
@@ -141,7 +141,7 @@ class Telegram
                 ],
                 [
                     'name' => 'caption',
-                    'contents' => $_caption,
+                    'contents' => $_caption . "\n@mangadl_tbot",
                 ],
             ],
         ]);
