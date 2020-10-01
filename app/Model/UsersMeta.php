@@ -29,10 +29,19 @@ class UsersMeta extends ModelAbstract
         return true;
     }
 
+    /**
+     * [update_meta description]
+     *
+     * @param   string  $_chat_id  [$_chat_id description]
+     * @param   string  $_key      [$_key description]
+     * @param   string  $_value    [$_value description]
+     *
+     * @return  [type]             [return description]
+     */
     public function update_meta(string $_chat_id, string $_key, string $_value)
     {
-        $sql = "UPDATE user_meta SET `value`='{$_value} 
-        WHERE `chat_id`='{$_chat_id}' AND `key`='{$_key}' ";
+        $sql = "UPDATE user_meta SET `value`='{$_value}'
+        WHERE `chat_id`='{$_chat_id}' AND `key`='{$_key}'";
 
         if ($this->conn->query($sql) === false) {
             $this->error["message"] = "couldnt send query to database";
@@ -62,7 +71,7 @@ class UsersMeta extends ModelAbstract
 
         if ($query->num_rows > 0) {
             $data = $query->fetch_all(MYSQLI_ASSOC);
-            return $data[0];
+            return $data[0]['value'];
         }
         $this->error["message"] = "there is nothing in database";
         return false;
