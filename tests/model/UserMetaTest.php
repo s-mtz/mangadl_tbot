@@ -11,7 +11,7 @@ class UserMetaTest extends TestCase
     public function testAddMeta()
     {
         $sm = new UsersMeta();
-        $result = $sm->add_meta("470001", "hello", "2");
+        $result = $sm->add_meta("4770007", "vip", "2");
         var_dump($sm->get_error());
 
         assertTrue($result);
@@ -20,9 +20,20 @@ class UserMetaTest extends TestCase
     public function testGetValue()
     {
         $sm = new UsersMeta();
-        $result = $sm->get_value("470001", "hello");
+        $result = $sm->get_value("4770001", "vip");
+        var_dump($result);
         var_dump($sm->get_error());
 
         assertTrue(is_string($result));
+    }
+
+    public function testUpdate()
+    {
+        $sm = new UsersMeta();
+        $result = $sm->update_meta("4770001", "vip", 5);
+        var_dump($result);
+        var_dump($sm->get_error());
+
+        assertTrue($result);
     }
 }
