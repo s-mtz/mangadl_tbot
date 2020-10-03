@@ -75,7 +75,11 @@ class Message
         } elseif ($result['type'] == 'chapter_start') {
             $messages = $this->chapter_finish_check($_bot);
             if ($messages) {
-                return $this->Q->get_mesage_threrade($_bot['from']['id']);
+                $set_queue_result = $this->Q->get_mesage_threrade($_bot['from']['id']);
+                if (!$set_queue_result) {
+                    $this->error["queue"] = $this->Q->get_error();
+                }
+                return $set_queue_result;
             }
             return false;
         }
@@ -175,7 +179,7 @@ class Message
                 'chapter_finish',
                 $_bot['date']
             );
-            if ($this->meta->get_value($_bot['from']['id'], "vip") >= time()) {
+            if ($this->meta->get_value($_bot['from']['id'], "vip")) {
                 $this->tg->send_message_request(
                     $_bot['from']['id'],
                     I18n::get("Finishing_chapter_success_VIP")
