@@ -28,7 +28,7 @@ class Queue
         }
 
         $start_chapter = intval($querry[2]['content']);
-        if ($meta->get_value($_chat_id, "vip" >= time())) {
+        if ($meta->get_value($_chat_id, "vip") >= time()) {
             $finish_chapter = intval($querry[3]['content']);
         } else {
             $finish_chapter = intval($querry[2]['content']);
