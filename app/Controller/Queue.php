@@ -83,6 +83,8 @@ class Queue
                     ) {
                         $this->error["message"] = "couldnt do set_queue properly";
                         return false;
+                    } else {
+                        continue;
                     }
                 }
                 $this->error["message"] = "couldnt do send_file_id_request properly";
