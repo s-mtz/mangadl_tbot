@@ -15,27 +15,28 @@ class Queue
 
     public function get_mesage_threrade(string $_chat_id)
     {
+        $chat_id = $_chat_id;
         $msg = new Messages();
         $Q = new Queues();
         $tg = new Telegram();
         $manga = new Mangas();
         $meta = new UsersMeta();
 
-        $querry = $msg->get_all_messages($_chat_id);
+        $querry = $msg->get_all_messages($chat_id);
         if (!$querry) {
             $this->error["message"] = "couldnt do get_all_messages";
             return false;
         }
 
         $start_chapter = $querry[2]['content'];
-        $user_vip = $meta->get_value($_chat_id, "vip");
+        $user_vip = $meta->get_value($chat_id, "vip");
         if ($user_vip) {
             $finish_chapter = $querry[3]['content'];
         } else {
             $finish_chapter = $querry[2]['content'];
         }
 
-        if (!$msg->finish($_chat_id)) {
+        if (!$msg->finish($chat_id)) {
             $this->error["message"] = "couldnt erase the message from database";
             return false;
         }
@@ -45,7 +46,7 @@ class Queue
             if (!is_array($manga_existance)) {
                 if (
                     !$Q->set_queue(
-                        $_chat_id,
+                        $chat_id,
                         $querry[0]['content'],
                         $querry[1]['content'],
                         $i,
@@ -60,19 +61,19 @@ class Queue
             } else {
                 if (
                     $tg->send_file_id_request_pdf(
-                        $_chat_id,
+                        $chat_id,
                         $manga_existance['pdf_id'],
                         $querry[1]['content'] . " ch " . $i . " PDF"
                     ) &&
                     $tg->send_file_id_request_zip(
-                        $_chat_id,
+                        $chat_id,
                         $manga_existance['zip_id'],
                         $querry[1]['content'] . " ch " . $i . " ZIP"
                     )
                 ) {
                     if (
                         !$Q->set_queue(
-                            $_chat_id,
+                            $chat_id,
                             $querry[0]['content'],
                             $querry[1]['content'],
                             $i,
