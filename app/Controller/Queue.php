@@ -26,12 +26,12 @@ class Queue
             $this->error["message"] = "couldnt do get_all_messages";
             return false;
         }
-        $start_chapter = $querry[2]['content'];
 
+        $start_chapter = intval($querry[2]['content']);
         if ($meta->get_value($_chat_id, "vip" >= time())) {
-            $finish_chapter = $querry[3]['content'];
+            $finish_chapter = intval($querry[3]['content']);
         } else {
-            $finish_chapter = $querry[2]['content'];
+            $finish_chapter = intval($querry[2]['content']);
         }
 
         for ($i = $start_chapter; $i <= $finish_chapter; $i++) {
