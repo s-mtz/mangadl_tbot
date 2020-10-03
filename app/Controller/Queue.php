@@ -78,6 +78,9 @@ class Queue
                         $this->error["message"] = "couldnt do set_queue properly";
                         return false;
                     }
+                    if (!$msg->finish($_chat_id)) {
+                        $this->error["message"] = "couldnt erase the message from database";
+                    }
                 }
                 $this->error["message"] = "couldnt do send_file_id_request properly";
                 return false;
