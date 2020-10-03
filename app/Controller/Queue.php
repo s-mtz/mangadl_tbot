@@ -27,11 +27,17 @@ class Queue
             return false;
         }
 
-        $start_chapter = intval($querry[2]['content']);
-        if ($meta->get_value($_chat_id, "vip") >= time()) {
-            $finish_chapter = intval($querry[3]['content']);
+        $start_chapter = $querry[2]['content'];
+        $user_vip = $meta->get_value($_chat_id, "vip");
+        if ($user_vip) {
+            $finish_chapter = $querry[3]['content'];
         } else {
-            $finish_chapter = intval($querry[2]['content']);
+            $finish_chapter = $querry[2]['content'];
+        }
+
+        if (!$msg->finish($_chat_id)) {
+            $this->error["message"] = "couldnt erase the message from database";
+            return false;
         }
 
         for ($i = $start_chapter; $i <= $finish_chapter; $i++) {
@@ -43,7 +49,7 @@ class Queue
                         $querry[0]['content'],
                         $querry[1]['content'],
                         $i,
-                        1,
+                        (int) $user_vip,
                         time(),
                         "pending"
                     )
@@ -70,7 +76,7 @@ class Queue
                             $querry[0]['content'],
                             $querry[1]['content'],
                             $i,
-                            1,
+                            (int) $user_vip,
                             time(),
                             "finished"
                         )
@@ -78,19 +84,12 @@ class Queue
                         $this->error["message"] = "couldnt do set_queue properly";
                         return false;
                     }
-                    if (!$msg->finish($_chat_id)) {
-                        $this->error["message"] = "couldnt erase the message from database";
-                    }
                 }
                 $this->error["message"] = "couldnt do send_file_id_request properly";
                 return false;
             }
         }
 
-        if (!$msg->finish($_chat_id)) {
-            $this->error["message"] = "couldnt erase the message from database";
-            return false;
-        }
         return true;
     }
 
