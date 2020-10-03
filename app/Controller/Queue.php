@@ -82,7 +82,6 @@ class Queue
                         $this->error["message"] = "couldnt erase the message from database";
                         return false;
                     }
-                    return true;
                 }
                 $this->error["message"] = "couldnt do send_file_id_request properly";
                 return false;
