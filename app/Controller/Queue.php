@@ -56,6 +56,8 @@ class Queue
                 ) {
                     $this->error["message"] = "couldnt do set_queue properly";
                     return false;
+                } else {
+                    continue;
                 }
             } else {
                 if (
