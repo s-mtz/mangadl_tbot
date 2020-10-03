@@ -29,9 +29,9 @@ class Bot
         // $this->tg->send_message_request($_ENV["ADMIN_ID"], $data);
         $sm = new Message();
         $listen = $sm->listen($update['message']);
-        if (!$listen) {
-            $this->tg->send_message_request($_ENV["ADMIN_ID"], json_encode($sm->get_error()));
-        }
+        // if (!$listen) {
+        //     $this->tg->send_message_request($_ENV["ADMIN_ID"], json_encode($sm->get_error()));
+        // }
         return $listen;
     }
 }
