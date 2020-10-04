@@ -73,8 +73,30 @@ class UsersMeta extends ModelAbstract
             $data = $query->fetch_all(MYSQLI_ASSOC);
             return $data[0]['value'];
         }
-        $this->error["message"] = "there is nothing in database";
         return false;
+    }
+
+    /**
+     *
+     *
+     * @param [type] $_chat_id
+     * @return void
+     */
+    public function get_all_users(string $_chat_id)
+    {
+        $sql = "SELECT * FROM user_meta 
+        WHERE chat_id = '{$_chat_id}'";
+
+        $query = $this->conn->query($sql);
+        if (!$query) {
+            $this->error["message"] = "couldnt connect to database";
+            return false;
+        }
+        if ($query->num_rows > 0) {
+            $data = $query->fetch_all(MYSQLI_ASSOC);
+            return $data;
+        }
+        return null;
     }
 
     /**
