@@ -6,24 +6,71 @@ use App\Model\User;
 use App\Controller\Users;
 use Lib\Telegram;
 use App\Controller\Queue;
+use App\Model\Queues;
 use I18n;
 use MangaCrawlers\Validator;
 
 class Message
 {
+    /**
+     * Undocumented variable
+     *
+     * @var array
+     */
     private $error = [];
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     */
     private $request;
-    private $meta;
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     */
+    private $queue_model;
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     */
     private $user_meta;
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     */
     private $db;
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     */
     private $user;
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     */
     private $tg;
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     */
     private $Q;
+    /**
+     * Undocumented variable
+     *
+     * @var array
+     */
     private $arr = [
         "start" => "/start",
         "help" => "/help",
         "English" => "/english",
         "Persian" => "/persian",
+        "Cancel" => "/cancel",
     ];
 
     public function __construct()
@@ -34,6 +81,7 @@ class Message
         $this->user = new User();
         $this->user_meta = new Users();
         $this->Q = new Queue();
+        $this->queue_model = new Queues();
     }
 
     public function listen($_bot)
@@ -88,21 +136,21 @@ class Message
         if (array_search($_bot['text'], $_arr) == "start") {
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("start"));
             return true;
-        }
-        if (array_search($_bot['text'], $_arr) == "help") {
+        } elseif (array_search($_bot['text'], $_arr) == "help") {
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("help"));
             return true;
-        }
-        if (array_search($_bot['text'], $_arr) == "English") {
+        } elseif (array_search($_bot['text'], $_arr) == "English") {
             $this->user_meta->set_meta($_bot['from']['id'], "language", "En_us");
             I18n::set_language('En_us');
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("English"));
             return true;
-        }
-        if (array_search($_bot['text'], $_arr) == "Persian") {
+        } elseif (array_search($_bot['text'], $_arr) == "Persian") {
             $this->user_meta->set_meta($_bot['from']['id'], "language", "Fa_ir");
             I18n::set_language('Fa_ir');
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("Persian"));
+            return true;
+        } elseif (array_search($_bot['text'], $_arr) == "Cancel") {
+            $this->queue_model->cancel($_bot['from']['id']);
             return true;
         }
     }

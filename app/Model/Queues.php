@@ -101,6 +101,23 @@ class Queues extends ModelAbstract
     }
 
     /**
+     *
+     * @param string $_chat_id
+     * @return boolean
+     */
+    public function cancel(string $_chat_id)
+    {
+        $sql = "UPDATE queue SET `status`='canceled' 
+        WHERE  `chat_id`={$_chat_id} AND `status`='pending'";
+
+        if ($this->conn->query($sql) === true) {
+            return true;
+        }
+        $this->error["message"] = $this->conn->error;
+        return false;
+    }
+
+    /**
      * [get_error description]
      *
      * @return  [type]  [return description]
