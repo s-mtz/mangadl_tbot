@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Model\Messages;
 use App\Model\Queues;
-use App\Model\UsersMeta;
+use App\Controller\Users;
 use App\Model\Mangas;
 use Lib\Telegram;
 use MangaCrawlers\Manga;
@@ -19,7 +19,7 @@ class Queue
         $Q = new Queues();
         $tg = new Telegram();
         $manga = new Mangas();
-        $meta = new UsersMeta();
+        $meta = new Users();
 
         $querry = $msg->get_all_messages($_chat_id);
         if (!$querry) {
@@ -28,7 +28,7 @@ class Queue
         }
 
         $start_chapter = $querry[2]['content'];
-        $user_vip = $meta->get_value($_chat_id, "vip");
+        $user_vip = $meta->get_meta($_chat_id, "vip");
         if ($user_vip) {
             $finish_chapter = $querry[3]['content'];
         } else {

@@ -4,7 +4,6 @@ namespace App\Controller;
 use App\Model\Messages;
 use App\Model\User;
 use App\Controller\Users;
-use App\Model\UsersMeta;
 use Lib\Telegram;
 use App\Controller\Queue;
 use I18n;
@@ -30,7 +29,6 @@ class Message
     public function __construct()
     {
         $this->request = new Validator();
-        $this->meta = new UsersMeta();
         $this->db = new Messages();
         $this->tg = new Telegram();
         $this->user = new User();
@@ -40,7 +38,7 @@ class Message
 
     public function listen($_bot)
     {
-        $language = $this->meta->get_value($_bot['from']['id'], "language");
+        $language = $this->user_meta->get_meta($_bot['from']['id'], "language");
 
         if ($language === false) {
             I18n::set_language("En_us");
@@ -179,7 +177,7 @@ class Message
                 'chapter_finish',
                 $_bot['date']
             );
-            if ($this->meta->get_value($_bot['from']['id'], "vip")) {
+            if ($this->user_meta->get_meta($_bot['from']['id'], "vip")) {
                 $this->tg->send_message_request(
                     $_bot['from']['id'],
                     I18n::get("Finishing_chapter_success_VIP")
