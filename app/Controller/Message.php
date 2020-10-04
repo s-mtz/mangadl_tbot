@@ -103,6 +103,8 @@ class Message
                 $this->error["message"] = "couldnt add the new user to database";
                 return false;
             }
+            $this->user_meta->set_meta($_bot['from']['id'], "limit", $_ENV["DEFAULT_LIMIT"]);
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("Wellcome"));
         }
 
         if (in_array($_bot['text'], $this->arr)) {
@@ -150,7 +152,7 @@ class Message
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("Persian"));
             return true;
         } elseif (array_search($_bot['text'], $_arr) == "Cancel") {
-            $this->queue_model->cancel($_bot['from']['id']);
+            $this->queue_model->change_pendings($_bot['from']['id'], "cancel");
             return true;
         }
     }

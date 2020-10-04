@@ -105,9 +105,9 @@ class Queues extends ModelAbstract
      * @param string $_chat_id
      * @return boolean
      */
-    public function cancel(string $_chat_id)
+    public function change_pendings(string $_chat_id, string $_status)
     {
-        $sql = "UPDATE queue SET `status`='canceled' 
+        $sql = "UPDATE queue SET `status`='{$_status}' 
         WHERE  `chat_id`={$_chat_id} AND `status`='pending'";
 
         if ($this->conn->query($sql) === true) {

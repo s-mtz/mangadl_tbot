@@ -12,4 +12,5 @@ $dotenv->required([
     'MYSQL_USER',
     'MYSQL_PASSWORD',
     'MYSQL_DATABASE',
+    'DEFAULT_LIMIT',
 ]);

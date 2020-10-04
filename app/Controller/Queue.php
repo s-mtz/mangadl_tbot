@@ -6,6 +6,7 @@ use App\Model\Messages;
 use App\Model\Queues;
 use App\Controller\Users;
 use App\Model\Mangas;
+use I18n;
 use Lib\Telegram;
 use MangaCrawlers\Manga;
 
@@ -60,6 +61,11 @@ class Queue
                     continue;
                 }
             } else {
+                if ($this->meta->get_meta($_chat_id, 'limit') < 1) {
+                    $this->queue_model->change_pendings($_chat_id, "out_of_stock");
+                    $this->tg->send_message_request($_chat_id, I18n::get("OutOfStock"));
+                    return false;
+                }
                 if (
                     $tg->send_file_id_request_pdf(
                         $_chat_id,
@@ -86,6 +92,7 @@ class Queue
                         $this->error["message"] = "couldnt do set_queue properly";
                         return false;
                     } else {
+                        $this->meta->update_limit($_chat_id, -1);
                         continue;
                     }
                 }
@@ -117,6 +124,11 @@ class Queue
         $download = new Manga();
         $manga_q = $Q->get_queue("pending");
         if (!$manga_q) {
+            return false;
+        }
+        if ($this->meta->get_meta($manga_q['chat_id'], 'limit') < 1) {
+            $this->queue_model->change_pendings($manga_q['chat_id'], "out_of_stock");
+            $this->tg->send_message_request($manga_q['chat_id'], I18n::get("OutOfStock"));
             return false;
         }
         if (!$Q->update_queue($manga_q['id'], "processing")) {
@@ -194,6 +206,7 @@ class Queue
                 $_ENV["ADMIN_ID"]
             );
         } else {
+            $this->meta->update_limit($manga_q['chat_id'], -1);
             $manga->set_manga(
                 $messagePDF['file_id'],
                 $messageZIP['file_id'],
