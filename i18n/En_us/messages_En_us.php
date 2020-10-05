@@ -9,6 +9,9 @@ $messages[
 \n⭕️ use - instead of space ⭕️\n\nfot the next step you would be asked for the requsted starting chapter so enter the chapter you want as a single number like -> 1\n\nthen you need to set the finishing chapter as well so the bot gets you all the chapters in between and again enter it as a single number like -> 5\n\nthen you will recive chapters 1 - 2 - 3 - 4 - 5 of the manga shingeki-no-kyojin\n\nPlease note that only VIP memebers would recive all the chapters and as a normal user you would be granted with only the starting chapter you asked for\n\n for changing the language use the desired bottom\n/persian\n/english";
 
 $messages["English"] = "you changed the language to English secussfully";
+$messages["OutOfStock"] =
+    "sorry to say but you are out of download limit\nyou can purchase limits to access vip membership for higher priority";
+$messages["Wellcome"] = "as a new member you will be able to download manga up to 50 one";
 
 $messages["Crawler_error"] = "please send the source correctly";
 $messages["Crawler_success"] = "The source has been set secsusfully";
@@ -21,5 +24,5 @@ $messages["Starting_chapter_success"] = "The Starting chapter has been set secsu
 
 $messages["Finishing_chapter_error"] = "Please send the finishing chapter correctly";
 $messages["Finishing_chapter_success_VIP"] =
-    "as VIP member we will send you all the files you asked for";
+    "as VIP member we will send you all the files you asked for\nPlease wait while we send you the requseted files";
 $messages["Finishing_chapter_success_NORMAL"] = "only the starting chapter would be sent to you";
