@@ -5,6 +5,7 @@ namespace Route;
 use App\Controller\Bot as ControllerBot;
 use App\Controller\Controller as ControllerController;
 use App\Controller\Queue as ControllerContQueue;
+use App\Controller\Payment as ControllerPayment;
 
 use FastRoute;
 
@@ -13,6 +14,7 @@ class Route
     private $dispatcher;
     private $controller;
     private $bot;
+    private $Payment;
     private $queue;
 
     public function __construct()
@@ -20,6 +22,7 @@ class Route
         $this->controller = new ControllerController();
         $this->bot = new ControllerBot();
         $this->queue = new ControllerContQueue();
+        $this->Payment = new ControllerPayment();
     }
 
     public function start()
@@ -31,6 +34,9 @@ class Route
 
     public function init(FastRoute\RouteCollector $r)
     {
+        $r->addRoute('GET', '/', [&$this->Payment, 'payment_make']);
+        $r->addRoute('GET', '/', [&$this->Payment, 'payment_validation']);
+        $r->addRoute('GET', '/', [&$this->Payment, 'payment_get']);
         $r->addRoute('GET', '/', [&$this->controller, 'home']);
         $r->addRoute('POST', '/bot', [&$this->bot, 'start']);
         $r->addRoute('POST', '/queue/{count:\d+}', [&$this->queue, 'run']);
@@ -58,7 +64,7 @@ class Route
                 return null;
                 break;
             case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                // $allowedMethods = $route_info[1];
+                // $allowedMethods = $route_info[1];s
                 return null;
                 break;
             case FastRoute\Dispatcher::FOUND:

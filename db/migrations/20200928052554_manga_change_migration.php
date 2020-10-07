@@ -7,6 +7,11 @@ final class MangaChangeMigration extends AbstractMigration
 {
     public function change(): void
     {
+        /**
+         * [$table description]
+         *
+         * @var [type]
+         */
         $table = $this->table('manga');
 
         $table
