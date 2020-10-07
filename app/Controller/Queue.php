@@ -13,39 +13,46 @@ use MangaCrawlers\Manga;
 class Queue
 {
     private $error = [];
+    private $messages;
+    private $queue_model;
+    private $telegram;
+    private $mangas;
+    private $user;
+    public function __construct()
+    {
+        $this->messages = new Messages();
+        $this->queue_model = new Queues();
+        $this->telegram = new Telegram();
+        $this->mangas = new Mangas();
+        $this->user = new Users();
+    }
 
     public function get_mesage_threrade(string $_chat_id)
     {
-        $msg = new Messages();
-        $Q = new Queues();
-        $tg = new Telegram();
-        $manga = new Mangas();
-        $meta = new Users();
-
-        $querry = $msg->get_all_messages($_chat_id);
+        $querry = $this->messages->get_all_messages($_chat_id);
         if (!$querry) {
             $this->error["message"] = "couldnt do get_all_messages";
             return false;
         }
 
         $start_chapter = $querry[2]['content'];
-        $user_vip = $meta->get_meta($_chat_id, "vip");
+        $user_vip = $this->user->get_meta($_chat_id, "vip");
         if ($user_vip) {
             $finish_chapter = $querry[3]['content'];
         } else {
             $finish_chapter = $querry[2]['content'];
         }
 
-        if (!$msg->finish($_chat_id)) {
+        if (!$this->messages->finish($_chat_id)) {
             $this->error["message"] = "couldnt erase the message from database";
             return false;
         }
 
         for ($i = $start_chapter; $i <= $finish_chapter; $i++) {
-            $manga_existance = $manga->get_manga($querry[1]['content'], $i);
+            $manga_existance = $this->mangas->get_manga($querry[1]['content'], $i);
             if (!is_array($manga_existance)) {
                 if (
-                    !$Q->set_queue(
+                    !$this->queue_model->set_queue(
                         $_chat_id,
                         $querry[0]['content'],
                         $querry[1]['content'],
@@ -61,25 +68,25 @@ class Queue
                     continue;
                 }
             } else {
-                if ($this->meta->get_meta($_chat_id, 'limit') < 1) {
+                if ($this->user->get_meta($_chat_id, 'limit') < 1) {
                     $this->queue_model->change_pendings($_chat_id, "out_of_stock");
                     $this->tg->send_message_request($_chat_id, I18n::get("OutOfStock"));
                     return false;
                 }
                 if (
-                    $tg->send_file_id_request_pdf(
+                    $this->telegram->send_file_id_request_pdf(
                         $_chat_id,
                         $manga_existance['pdf_id'],
                         $querry[1]['content'] . " ch " . $i . " PDF"
                     ) &&
-                    $tg->send_file_id_request_zip(
+                    $this->telegram->send_file_id_request_zip(
                         $_chat_id,
                         $manga_existance['zip_id'],
                         $querry[1]['content'] . " ch " . $i . " ZIP"
                     )
                 ) {
                     if (
-                        !$Q->set_queue(
+                        !$this->queue_model->set_queue(
                             $_chat_id,
                             $querry[0]['content'],
                             $querry[1]['content'],
@@ -92,7 +99,7 @@ class Queue
                         $this->error["message"] = "couldnt do set_queue properly";
                         return false;
                     } else {
-                        $this->meta->update_limit($_chat_id, -1);
+                        $this->user->update_limit($_chat_id, -1);
                         continue;
                     }
                 }
@@ -106,39 +113,35 @@ class Queue
 
     private function error_function($_message, $_chat_id)
     {
-        $tg = new Telegram();
+        $this->telegram = new Telegram();
         $this->error["message"] = $_message;
-        $tg->send_message_request($_chat_id, $_message);
+        $this->telegram->send_message_request($_chat_id, $_message);
         return false;
     }
 
     public function run(int $_count = 1)
     {
-        $tg = new Telegram();
-        $Q = new Queues();
-        $manga = new Mangas();
-
-        if ($Q->get_processing_count() > $_count) {
+        if ($this->queue_model->get_processing_count() > $_count) {
             return null;
         }
         $download = new Manga();
-        $manga_q = $Q->get_queue("pending");
+        $manga_q = $this->queue_model->get_queue("pending");
         if (!$manga_q) {
             return false;
         }
-        if ($this->meta->get_meta($manga_q['chat_id'], 'limit') < 1) {
+        if ($this->user->get_meta($manga_q['chat_id'], 'limit') < 1) {
             $this->queue_model->change_pendings($manga_q['chat_id'], "out_of_stock");
             $this->tg->send_message_request($manga_q['chat_id'], I18n::get("OutOfStock"));
             return false;
         }
-        if (!$Q->update_queue($manga_q['id'], "processing")) {
-            $Q->update_queue($manga_q['id'], "error");
+        if (!$this->queue_model->update_queue($manga_q['id'], "processing")) {
+            $this->queue_model->update_queue($manga_q['id'], "error");
             $this->error_function("Couldn't proccess your job", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in DB  " .
                     $manga_q['id'] .
                     " ERROR : " .
-                    json_encode($Q->get_error()),
+                    json_encode($this->queue_model->get_error()),
                 $_ENV["ADMIN_ID"]
             );
         }
@@ -150,7 +153,7 @@ class Queue
                 ABSPATH . "upload/"
             )
         ) {
-            $Q->update_queue($manga_q['id'], "error");
+            $this->queue_model->update_queue($manga_q['id'], "error");
             $this->error_function("There is a problem in donwloading files", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in donwloading files " .
@@ -161,7 +164,7 @@ class Queue
             );
         }
 
-        $messageZIP = $tg->send_file_request(
+        $messageZIP = $this->telegram->send_file_request(
             $manga_q['chat_id'],
             ABSPATH .
                 "upload/" .
@@ -178,7 +181,7 @@ class Queue
             $manga_q['manga'] . " ch " . $manga_q['chapter'] . " ZIP"
         );
 
-        $messagePDF = $tg->send_file_request(
+        $messagePDF = $this->telegram->send_file_request(
             $manga_q['chat_id'],
             ABSPATH .
                 "upload/" .
@@ -196,18 +199,18 @@ class Queue
         );
 
         if (!$messagePDF || !$messageZIP) {
-            $Q->update_queue($manga_q['id'], "error");
+            $this->queue_model->update_queue($manga_q['id'], "error");
             $this->error_function("There is a problem in sending the files", $manga_q['chat_id']);
             return $this->error_function(
                 "There is a problem in SendFile  " .
                     $manga_q['id'] .
                     " ERROR : " .
-                    json_encode($tg->get_error()),
+                    json_encode($this->telegram->get_error()),
                 $_ENV["ADMIN_ID"]
             );
         } else {
-            $this->meta->update_limit($manga_q['chat_id'], -1);
-            $manga->set_manga(
+            $this->user->update_limit($manga_q['chat_id'], -1);
+            $this->mangas->set_manga(
                 $messagePDF['file_id'],
                 $messageZIP['file_id'],
                 $manga_q['crawler'],
@@ -217,13 +220,13 @@ class Queue
             );
         }
 
-        if (!$Q->update_queue($manga_q['id'], "finished")) {
-            $Q->update_queue($manga_q['id'], "error");
+        if (!$this->queue_model->update_queue($manga_q['id'], "finished")) {
+            $this->queue_model->update_queue($manga_q['id'], "error");
             return $this->error_function(
                 "Problem in complete queue Q id : " .
                     $manga_q['id'] .
                     " ERROR : " .
-                    json_encode($Q->get_error()),
+                    json_encode($this->queue_model->get_error()),
                 $_ENV["ADMIN_ID"]
             );
         }

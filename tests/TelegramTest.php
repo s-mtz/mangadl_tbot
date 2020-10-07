@@ -24,8 +24,9 @@ class TelegramTest extends TestCase
     {
         $tg = new Telegram();
         $request = $tg->send_file_request(
-            476080724,
-            '/home/smtz/Php_projects/mangadl_tbot/bleach 2.pdf'
+            $_ENV["ADMIN_ID"],
+            ABSPATH . 'upload/mangapanda/bleach/5/1.jpg',
+            'Fuck'
         );
         var_dump($request);
         $this->assertTrue(is_array($request));
@@ -34,9 +35,10 @@ class TelegramTest extends TestCase
     public function testUploadFileId()
     {
         $tg = new Telegram();
-        $request = $tg->send_file_id_request(
-            476080724,
-            "BQACAgQAAxkDAAIB319t5ztOVhqJAnqt7bBZ7soZIrIkAALcCAACZKpwU09oWGrH5RQxGwQ"
+        $request = $tg->send_file_id_request_pdf(
+            $_ENV["ADMIN_ID"],
+            "BQACAgQAAxkDAAIgQ197QQN4zuVKMnQ26kBVYym6nWcxAAJQBgACaufgU1DpWo25JZo-GwQ",
+            "fuckit"
         );
         var_dump($request);
         $this->assertTrue($request);
