@@ -34,7 +34,7 @@ class Route
 
     public function init(FastRoute\RouteCollector $r)
     {
-        $r->addRoute('GET', '/peyment', [&$this->controller, 'payment']);
+        $r->addRoute('GET', '/payment', [&$this->controller, 'payment']);
         $r->addRoute('GET', '/', [&$this->controller, 'home']);
         $r->addRoute('POST', '/bot', [&$this->bot, 'start']);
         $r->addRoute('POST', '/queue/{count:\d+}', [&$this->queue, 'run']);
