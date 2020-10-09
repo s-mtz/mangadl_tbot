@@ -10,6 +10,11 @@ class Controller
 
     public function home()
     {
-        echo "HELLO";
+        echo "<h1>HELLO</h1>";
+    }
+
+    public function payment()
+    {
+        echo "<h1>here must the session and redirect shit stuff right ?</h1>";
     }
 }
