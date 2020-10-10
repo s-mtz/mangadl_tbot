@@ -33,6 +33,11 @@ class Payment
         echo "peyment_get";
     }
 
+    public function payment()
+    {
+        echo "<h1>here must the session and redirect shit stuff right ?</h1>";
+    }
+
     /**
      * [get_error description]
      *
