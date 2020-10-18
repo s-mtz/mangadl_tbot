@@ -17,13 +17,14 @@ class Payments extends ModelAbstract
         string $_chat_id,
         int $_limit,
         int $_price,
-        int $_currency,
-        int $_type,
+        string $_currency,
+        string $_type,
         string $_status,
-        int $_time
+        int $_time,
+        string $_token
     ) {
-        $sql = "INSERT INTO payment (chat_id, limit, price, currency, type, type, time) 
-        VALUES ('{$_chat_id}', $_limit, $_price, $_currency, $_type, '{$_status}', $_time)";
+        $sql = "INSERT INTO payment (chat_id, `limit`, price, currency, `type`, `status`, `time`, token) 
+        VALUES ('{$_chat_id}', $_limit, $_price, '{$_currency}', '{$_type}', '{$_status}', $_time, '{$_token}')";
 
         if ($this->conn->query($sql) === false) {
             $this->error["message"] = "couldnt send set_queue query to database";
@@ -51,16 +52,34 @@ class Payments extends ModelAbstract
         return false;
     }
 
-    public function update_status(int $_chat_id, string $_new_status)
+    public function update_payment(int $_chat_id, string $_field, string $_new_field)
     {
-        $sql = "UPDATE payment SET status = '{$_new_status}' 
-                WHERE  id = $_chat_id";
+        $sql = "UPDATE payment SET '{$_field}' = '{$_new_field}' 
+                WHERE  chat_id = $_chat_id
+                ORDER BY id DESC LIMIT 1";
 
         if ($this->conn->query($sql) === true) {
             return true;
         }
         $this->error["message"] = "there is nothing in database";
         return false;
+    }
+
+    public function last_id()
+    {
+        $sql = "SELECT * FROM payment 
+                ORDER BY id DESC LIMIT 1";
+
+        $query = $this->conn->query($sql);
+        if ($query->num_rows > 0) {
+            $data = $query->fetch_all(MYSQLI_ASSOC);
+            if (empty($data)) {
+                $this->error["message"] = "couldnt find the request in database";
+                return false;
+            }
+            return $data[0]["id"];
+        }
+        return 0;
     }
 
     /**
