@@ -21,7 +21,7 @@ class Mangas extends ModelAbstract
         int $_chapter,
         int $_time
     ) {
-        $sql = "INSERT INTO manga (pdf_id, zip_id, crawler, manga, chapter, time) 
+        $sql = "INSERT INTO manga (pdf_id, zip_id, crawler, manga, chapter, `time`) 
                 VALUES ('{$_pdf_id}','{$_zip_id}', '{$_crawler}', '{$_manga}', {$_chapter}, {$_time})";
 
         if ($this->conn->query($sql) === false) {
