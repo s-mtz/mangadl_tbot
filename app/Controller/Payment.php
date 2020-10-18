@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use GuzzleHttp\Client;
 use App\Model\Payments;
 
 class Payment
@@ -11,31 +12,62 @@ class Payment
      * @var array
      */
     private $error = [];
-    private $pay;
+    private $payment;
 
     public function __construct()
     {
-        $this->pay = new Payments();
+        $this->payment = new Payments();
     }
 
-    public function payment_make()
-    {
-        echo "payment_make";
-    }
+    public function make_payment(
+        int $_price,
+        string $_currency,
+        string $_chat_id,
+        string $_type,
+        int $_limit
+    ) {
+        $params = [
+            "order_id" => $this->payment->last_id() + 1,
+            "amount" => $_price,
+            "name" => $_chat_id,
+            "desc" => "خرید $_limit عدد چپتر برای ربات @mangadl_tbot به ازای $_price $_currency",
+            "callback" => "manga.test/payment",
+        ];
 
-    public function payment_validation()
-    {
-        echo "payment_validation";
-    }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://api.idpay.ir/v1.1/payment');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-API-KEY: 6a7f99eb-7c20-4412-a972-6dfb7cd253a4',
+            'X-SANDBOX: 1',
+        ]);
 
-    public function payment_get()
-    {
-        echo "peyment_get";
-    }
+        $result = curl_exec($ch);
+        if (!$result) {
+            $this->error["message"] = "couldnt send the post to idpay";
+            return false;
+        }
+        curl_close($ch);
 
-    public function payment()
-    {
-        echo "<h1>here must the session and redirect shit stuff right ?</h1>";
+        $result = json_decode($result, true);
+
+        if ($result["id"]) {
+            $this->payment->set_payment(
+                $_chat_id,
+                $_limit,
+                $_price,
+                $_currency,
+                $_type,
+                "pending",
+                time(),
+                $result["id"]
+            );
+            return $result["link"];
+        }
+        $this->error["message"] = $this->payment->get_error();
+        return false;
     }
 
     /**
