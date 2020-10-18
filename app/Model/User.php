@@ -19,7 +19,7 @@ class User extends ModelAbstract
      */
     public function new_user(string $_chat_id, int $_time)
     {
-        $sql = "INSERT INTO user (chat_id, time) 
+        $sql = "INSERT INTO user (chat_id, `time`) 
         VALUES ('{$_chat_id}', $_time)";
 
         if ($this->conn->query($sql) === false) {
