@@ -22,7 +22,7 @@ class Queues extends ModelAbstract
         int $_time,
         string $_status
     ) {
-        $sql = "INSERT INTO queue (chat_id, crawler, manga, chapter, type, time, status) 
+        $sql = "INSERT INTO queue (chat_id, crawler, manga, chapter, `type`, `time`, `status`) 
         VALUES ('{$_chat_id}', '{$_crawler}', '{$_manga}', $_chapter, $_type, $_time, '{$_status}')";
 
         if ($this->conn->query($sql) === false) {
@@ -39,8 +39,8 @@ class Queues extends ModelAbstract
      */
     public function get_queue($_status)
     {
-        $sql = "SELECT * FROM queue WHERE status = '{$_status}'
-                ORDER BY type DESC LIMIT 1";
+        $sql = "SELECT * FROM `queue` WHERE `status` = '{$_status}'
+                ORDER BY `type` DESC LIMIT 1";
 
         if (!($query = $this->conn->query($sql))) {
             $this->error["message"] = "couldnt connect to database";
@@ -70,7 +70,7 @@ class Queues extends ModelAbstract
      */
     public function update_queue(int $_id, string $_new_status)
     {
-        $sql = "UPDATE queue SET status = '{$_new_status}' 
+        $sql = "UPDATE `queue` SET `status` = '{$_new_status}' 
                 WHERE  id = $_id";
 
         if ($this->conn->query($sql) === true) {
