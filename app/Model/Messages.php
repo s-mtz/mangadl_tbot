@@ -22,7 +22,7 @@ class Messages extends ModelAbstract
     {
         $_content = filter_var($_content, FILTER_SANITIZE_STRING);
 
-        $sql = "INSERT INTO messages (chat_id, content, type, time) 
+        $sql = "INSERT INTO messages (chat_id, content, `type`, `time`) 
                 VALUES ('{$_chat_id}', '{$_content}', '{$_type}', $_time)";
 
         if ($this->conn->query($sql) === false) {
