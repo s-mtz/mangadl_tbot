@@ -71,6 +71,10 @@ class Message
         "English" => "/english",
         "Persian" => "/persian",
         "Cancel" => "/cancel",
+        "VIP" => "/vip",
+        "V50T" => "/V50T",
+        "V100T" => "/V100T",
+        "V200T" => "/V200T",
     ];
 
     public function __construct()
@@ -152,7 +156,26 @@ class Message
             $this->tg->send_message_request($_bot['from']['id'], I18n::get("Persian"));
             return true;
         } elseif (array_search($_bot['text'], $_arr) == "Cancel") {
-            $this->queue_model->change_pendings($_bot['from']['id'], "cancel");
+            $flag = $this->queue_model->change_pendings($_bot['from']['id'], "cancel");
+            if ($flag) {
+                $this->tg->send_message_request($_bot['from']['id'], I18n::get("cancel_success"));
+                return true;
+            }
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("cancel_fail"));
+            return true;
+        } elseif (array_search($_bot['text'], $_arr) == "VIP") {
+            $this->tg->send_message_request($_bot['from']['id'], I18n::get("VIP"));
+            return true;
+        } elseif (array_search($_bot['text'], $_arr) == "V50T") {
+            // send message url;
+            // $this->tg->send_message_request(
+            //     $_bot['from']['id'],
+            //     $_ENV["HOST"] . "payment?url=$url"
+            // );
+            return true;
+        } elseif (array_search($_bot['text'], $_arr) == "V100T") {
+            return true;
+        } elseif (array_search($_bot['text'], $_arr) == "V200T") {
             return true;
         }
     }
