@@ -12,4 +12,9 @@ class Controller
     {
         echo "<h1>HELLO</h1>";
     }
+
+    public function payment()
+    {
+        echo "<h1>payment</h1>";
+    }
 }
