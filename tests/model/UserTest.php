@@ -11,7 +11,7 @@ class UserTest extends TestCase
     public function testNewUser()
     {
         $sm = new User();
-        $result = $sm->new_user("470001", "permuim", 2300025);
+        $result = $sm->new_user("470001", time());
         var_dump($sm->get_error());
 
         assertTrue($result);

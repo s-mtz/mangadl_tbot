@@ -16,7 +16,7 @@ class TelegramTest extends TestCase
     public function testSendMessage()
     {
         $tg = new Telegram();
-        $request = $tg->send_message_request(476080724, 'Welcome to mangadl_tbot');
+        $request = $tg->send_message_request($_ENV["ADMIN_ID"], 'Welcome to mangadl_tbot');
         $this->assertTrue($request);
     }
 
