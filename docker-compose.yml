@@ -1,0 +1,76 @@
+version: "3"
+
+services:
+    vpn:
+        image: bubuntux/nordvpn
+        container_name: mangadl-vpn
+        cap_add:
+            - NET_ADMIN # Required
+            - SYS_MODULE # Required for TECHNOLOGY=NordLynx
+        sysctls:
+            - net.ipv4.conf.all.rp_filter=2
+        devices:
+            - /dev/net/tun
+        network_mode: bridge
+        environment:
+            - NETWORK=192.168.1.0/24
+            - USER=${NORDVPN_USER}
+            - PASS=${NORDVPN_PASS}
+            - CONNECT=US
+            - TECHNOLOGY=NordLynx
+        ulimits: # Recommended for High bandwidth scenarios
+            memlock:
+                soft: -1
+                hard: -1
+        ports:
+            - 8000:8000 # app
+            - 8081:80 #phpmyadmin
+            # - 8136:3306 #mysql
+
+    mysql:
+        image: mysql:latest
+        container_name: mangadl-mysql
+        restart: always
+        tty: true
+        volumes:
+            - ./dbdata:/var/lib/mysql
+        environment:
+            - MYSQL_RANDOM_ROOT_PASSWORD=yes
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        network_mode: service:vpn
+        # networks:
+        #     - mangadl_network
+    app:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        container_name: mangadl-app
+        restart: always
+        # ports:
+        #     - "8000:8000"
+        env_file:
+            - .env
+        volumes:
+            - ".:/app"
+        # networks:
+        #     - mangadl_network
+        network_mode: service:vpn
+        depends_on:
+            - mysql
+            - vpn
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: mangadl-phpmyadmin
+        environment:
+            - PMA_HOST=127.0.0.1
+            - PMA_PORT=8136
+            - PMA_ARBITRARY=1
+        restart: always
+        network_mode: service:vpn
+        # networks:
+        #     - mangadl_network
+# networks:
+#     mangadl_network:
+#         driver: bridge
