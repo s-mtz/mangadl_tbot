@@ -5,3 +5,4 @@ bleach 2.pdf
 *.log
 upload/
 p-test.php
+dbdata/
